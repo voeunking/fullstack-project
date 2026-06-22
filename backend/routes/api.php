@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Route;
 // Public auth routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+// Public product/category routes
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{product}', [ProductController::class, 'show']);
+Route::get('/categories', [CategoryController::class, 'index']);
+
 // Protected auth routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {

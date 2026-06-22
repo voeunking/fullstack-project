@@ -5,24 +5,15 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Auth;
+
 class AdminMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-         {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            return response()->json([
-                'message' => 'Unauthorized (Admin only)'
-            ], 403);
+        if (!session()->has('user_id') || session('role') !== 'admin') {
+            return redirect('/')->with('error', 'Unauthorized access');
         }
 
         return $next($request);
-        }
     }
 }
