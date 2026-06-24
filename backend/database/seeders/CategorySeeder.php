@@ -8,15 +8,18 @@ use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Category::create([
-            'name'=> 'Computer',
-            'dec'=> 'A new product arrivel'
+        $categories = [
+            ['name' => 'Computer', 'description' => 'Laptops, desktops, and accessories'],
+            ['name' => 'Phones', 'description' => 'Smartphones and mobile accessories'],
+            ['name' => 'Audio', 'description' => 'Headphones, speakers, and audio gear'],
+            ['name' => 'Wearables', 'description' => 'Smartwatches and fitness trackers'],
+            ['name' => 'Accessories', 'description' => 'Cables, cases, and more'],
+        ];
 
-        ]);
+        foreach ($categories as $category) {
+            Category::create($category);
+        }
     }
 }

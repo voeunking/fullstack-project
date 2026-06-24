@@ -1,27 +1,17 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 type AuthMode = 'login' | 'register'
 type Role = 'user' | 'admin'
 
-type Product = {
-  id: number
-  name: string
-  price: number
-  description?: string
-  image?: string
-}
-
+const router = useRouter()
+const route = useRoute()
 const mode = ref<AuthMode>('login')
 const role = ref<Role>('user')
 const loading = ref(false)
 const message = ref('')
 const error = ref('')
-const isLoggedIn = ref(false)
-const showShop = ref(false)
-const products = ref<Product[]>([])
-const cartCount = ref(0)
-const backendBaseUrl = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000').replace(/\/$/, '')
 
 const form = reactive({
   name: '',
@@ -30,21 +20,12 @@ const form = reactive({
   confirmPassword: '',
 })
 
+const backendBaseUrl = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000').replace(/\/$/, '')
+
 const toggleMode = () => {
   mode.value = mode.value === 'login' ? 'register' : 'login'
   message.value = ''
   error.value = ''
-}
-
-const fetchProducts = async () => {
-  try {
-    const response = await fetch(`${backendBaseUrl}/api/products`)
-    const data = await response.json()
-    const list = Array.isArray(data) ? data : data.data || []
-    products.value = list
-  } catch (err) {
-    console.error(err)
-  }
 }
 
 const submitForm = async () => {
@@ -60,28 +41,16 @@ const submitForm = async () => {
   try {
     const endpoint = `/api/${mode.value}`
     const payload = mode.value === 'login'
-      ? {
-          email: form.email,
-          password: form.password,
-        }
-      : {
-          name: form.name,
-          email: form.email,
-          password: form.password,
-          role: role.value,
-        }
+      ? { email: form.email, password: form.password }
+      : { name: form.name, email: form.email, password: form.password, role: role.value }
 
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(payload),
     })
 
     const data = await response.json()
-
     if (!response.ok) {
       throw new Error(data.message || `Unable to ${mode.value}`)
     }
@@ -89,16 +58,12 @@ const submitForm = async () => {
     localStorage.setItem('token', data.token || '')
     localStorage.setItem('user', JSON.stringify(data.user || {}))
 
-    message.value = `${role.value === 'admin' ? 'Admin' : 'User'} ${mode.value} successful.`
-    isLoggedIn.value = true
-
     if (data.user?.role === 'admin') {
-      window.location.href = `${backendBaseUrl}/admin/dashboard`
+      window.location.href = `${backendBaseUrl}/admin/login?token=${data.token}`
       return
     }
 
-    showShop.value = true
-    await fetchProducts()
+    router.push('/dashboard/products')
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Something went wrong.'
   } finally {
@@ -106,42 +71,28 @@ const submitForm = async () => {
   }
 }
 
-const logout = () => {
-  localStorage.removeItem('token')
-  localStorage.removeItem('user')
-  isLoggedIn.value = false
-  showShop.value = false
-  message.value = ''
-  error.value = ''
-}
-
 onMounted(() => {
-  const savedUser = localStorage.getItem('user')
-  if (savedUser) {
-    isLoggedIn.value = true
-    showShop.value = JSON.parse(savedUser).role !== 'admin'
-    if (showShop.value) {
-      fetchProducts()
-    }
+  const token = localStorage.getItem('token')
+  console.log('App mounted, token present:', !!token)
+  console.log('Current route:', route.path)
+  if (token && route.path === '/') {
+    router.push('/dashboard/products')
   }
 })
 </script>
 
 <template>
-  <main class="page-shell">
-    <section v-if="!showShop" class="auth-panel">
+  <router-view v-if="route.path.startsWith('/dashboard')" />
+
+  <main v-else class="auth-page">
+    <section class="auth-panel">
       <div class="auth-card">
         <div class="auth-header">
-          <p class="eyebrow">Welcome</p>
-          <h1>{{ mode === 'login' ? 'Login' : 'Register' }}</h1>
+          <h1>Welcome to ShopHub</h1>
+          <p>Your one-stop shop for everything</p>
         </div>
 
-        <div class="role-switcher">
-          <button :class="role === 'user' ? 'active' : ''" @click="role = 'user'">User</button>
-          <button :class="role === 'admin' ? 'active' : ''" @click="role = 'admin'">Admin</button>
-        </div>
-
-        <form @submit.prevent="submitForm">
+        <form @submit.prevent="submitForm" class="auth-form">
           <div class="field" v-if="mode === 'register'">
             <label for="name">Full name</label>
             <input id="name" v-model="form.name" type="text" placeholder="Jane Doe" />
@@ -162,239 +113,180 @@ onMounted(() => {
             <input id="confirmPassword" v-model="form.confirmPassword" type="password" placeholder="Repeat password" />
           </div>
 
+          <div class="role-switcher" v-if="mode === 'register'">
+            <button type="button" :class="role === 'user' ? 'active' : ''" @click="role = 'user'">User</button>
+            <button type="button" :class="role === 'admin' ? 'active' : ''" @click="role = 'admin'">Admin</button>
+          </div>
+
           <button class="submit-btn" type="submit" :disabled="loading">
             {{ loading ? 'Please wait...' : mode === 'login' ? 'Login' : 'Register' }}
           </button>
         </form>
 
         <button class="toggle-btn" @click="toggleMode">
-          {{ mode === 'login' ? 'Create an account' : 'Back to login' }}
+          {{ mode === 'login' ? "Don't have an account? Register" : 'Already have an account? Login' }}
         </button>
 
         <p v-if="message" class="success-message">{{ message }}</p>
         <p v-if="error" class="error-message">{{ error }}</p>
       </div>
     </section>
-
-    <section v-else class="shop-panel">
-      <header class="shop-header">
-        <div>
-          <p class="eyebrow">Shop</p>
-          <h2>Featured Products</h2>
-        </div>
-        <div class="shop-actions">
-          <span class="cart-pill">Cart: {{ cartCount }}</span>
-          <button class="logout-btn" @click="logout">Logout</button>
-        </div>
-      </header>
-
-      <div class="product-grid">
-        <article v-for="product in products" :key="product.id" class="product-card">
-          <div class="product-image">{{ product.name.charAt(0) }}</div>
-          <h3>{{ product.name }}</h3>
-          <p>{{ product.description || 'Great product for your daily needs.' }}</p>
-          <div class="product-footer">
-            <strong>${{ product.price }}</strong>
-            <button @click="cartCount++">Add to cart</button>
-          </div>
-        </article>
-      </div>
-    </section>
   </main>
 </template>
 
 <style scoped>
-.page-shell {
+.auth-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #eef5ff, #f7fbf5);
-  padding: 2rem;
-}
-
-.auth-panel {
-  min-height: 100vh;
+  background: linear-gradient(135deg, #eef5ff 0%, #f7fbf5 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1.5rem;
+}
+
+.auth-panel {
+  width: 100%;
+  max-width: 480px;
 }
 
 .auth-card {
-  width: min(460px, 100%);
-  background: #fff;
-  border-radius: 18px;
-  padding: 2rem;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+  background: white;
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
 .auth-header h1 {
-  margin: 0;
-  font-size: 2rem;
+  font-size: 1.75rem;
+  font-weight: 700;
   color: #0f172a;
+  margin: 0 0 0.5rem;
 }
 
-.role-switcher {
-  display: flex;
-  gap: 0.5rem;
-  margin: 1rem 0;
+.auth-header p {
+  color: #64748b;
+  font-size: 0.9375rem;
+  margin: 0;
 }
 
-.role-switcher button {
-  flex: 1;
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  padding: 0.7rem;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.role-switcher button.active {
-  background: #0f172a;
-  color: #fff;
-}
-
-form {
+.auth-form {
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 1rem;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .field label {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #334155;
 }
 
 .field input {
-  padding: 0.8rem 0.9rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  outline: none;
+  padding: 0.875rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  font-size: 0.9375rem;
+  transition: all 0.2s;
 }
 
 .field input:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+  outline: none;
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.role-switcher {
+  display: flex;
+  gap: 0.5rem;
+  background: #f1f5f9;
+  padding: 0.25rem;
+  border-radius: 0.75rem;
+}
+
+.role-switcher button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.625rem;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.role-switcher button.active {
+  background: white;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .submit-btn {
-  background: #0f172a;
-  color: #fff;
-  border: 0;
-  border-radius: 10px;
-  padding: 0.9rem;
-  font-weight: 700;
+  margin-top: 0.5rem;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .toggle-btn {
-  margin-top: 0.9rem;
+  margin-top: 1rem;
   background: transparent;
-  border: 0;
-  color: #2563eb;
+  border: none;
+  color: #3b82f6;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.875rem;
+  width: 100%;
+  text-align: center;
+}
+
+.toggle-btn:hover {
+  text-decoration: underline;
 }
 
 .success-message {
-  margin-top: 0.9rem;
-  color: #0f9f6e;
+  margin-top: 1rem;
+  text-align: center;
+  color: #059669;
   font-weight: 600;
+  font-size: 0.875rem;
 }
 
 .error-message {
-  margin-top: 0.9rem;
+  margin-top: 1rem;
+  text-align: center;
   color: #dc2626;
   font-weight: 600;
-}
-
-.shop-panel {
-  width: min(1200px, 100%);
-  margin: 0 auto;
-}
-
-.shop-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.shop-actions {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.cart-pill {
-  background: #eef2ff;
-  color: #1d4ed8;
-  padding: 0.6rem 0.9rem;
-  border-radius: 999px;
-  font-weight: 700;
-}
-
-.logout-btn {
-  background: #111827;
-  color: #fff;
-  border: 0;
-  border-radius: 10px;
-  padding: 0.7rem 1rem;
-  cursor: pointer;
-}
-
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1rem;
-}
-
-.product-card {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 16px;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
-}
-
-.product-image {
-  background: #e2e8f0;
-  height: 140px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #334155;
-  margin-bottom: 0.75rem;
-}
-
-.product-card h3 {
-  margin: 0;
-}
-
-.product-card p {
-  color: #64748b;
-  min-height: 48px;
-}
-
-.product-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.8rem;
-}
-
-.product-footer button {
-  background: #2563eb;
-  color: #fff;
-  border: 0;
-  border-radius: 10px;
-  padding: 0.6rem 0.8rem;
-  cursor: pointer;
+  font-size: 0.875rem;
 }
 </style>

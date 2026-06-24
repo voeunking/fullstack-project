@@ -15,14 +15,20 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
-        $products = Product::all();
-        return response()->json([
-            'success'=>true,
-            'message'=>'All products get successfully!',
-            'data'=> $products
-
-        ],Response::HTTP_OK);
+        try {
+            $products = Product::with('category')->get();
+            return response()->json([
+                'success'=>true,
+                'message'=>'All products get successfully!',
+                'data'=> $products
+            ],Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success'=>false,
+                'message'=>'Error fetching products',
+                'error'=>$e->getMessage()
+            ],Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
