@@ -5,7 +5,7 @@
       <p class="sub">Track your order status from checkout to delivery.</p>
     </div>
 
-    <div v-else-if="!orders.length" class="state-center">
+    <div v-if="!orders.length" class="state-center">
       <p>No orders yet</p>
       <router-link to="/dashboard/products" class="shop-btn">Start Shopping</router-link>
     </div>

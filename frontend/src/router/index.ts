@@ -12,35 +12,41 @@ const router = createRouter({
     {
       path: '/dashboard',
       component: () => import('../views/UserDashboard.vue'),
-      children: [
-        {
-          path: '',
-          redirect: 'products',
-        },
-        {
-          path: 'products',
-          name: 'products',
-          component: () => import('../views/Products.vue'),
-        },
-        {
-          path: 'cart',
-          name: 'cart',
-          component: () => import('../views/Cart.vue'),
-          meta: { requiresAuth: true },
-        },
-        {
-          path: 'checkout',
-          name: 'checkout',
-          component: () => import('../views/Checkout.vue'),
-          meta: { requiresAuth: true },
-        },
-        {
-          path: 'orders',
-          name: 'orders',
-          component: () => import('../views/Orders.vue'),
-          meta: { requiresAuth: true },
-        },
-      ],
+children: [
+         {
+           path: '',
+           redirect: 'products',
+         },
+         {
+           path: 'products',
+           name: 'products',
+           component: () => import('../views/Products.vue'),
+         },
+         {
+           path: 'profile',
+           name: 'profile',
+           component: () => import('../views/Profile.vue'),
+           meta: { requiresAuth: true },
+         },
+         {
+           path: 'cart',
+           name: 'cart',
+           component: () => import('../views/Cart.vue'),
+           meta: { requiresAuth: true },
+         },
+         {
+           path: 'checkout',
+           name: 'checkout',
+           component: () => import('../views/Checkout.vue'),
+           meta: { requiresAuth: true },
+         },
+         {
+           path: 'orders',
+           name: 'orders',
+           component: () => import('../views/Orders.vue'),
+           meta: { requiresAuth: true },
+         },
+       ],
     },
     {
       path: '/:pathMatch(.*)',

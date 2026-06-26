@@ -6,17 +6,18 @@
           <svg class="logo-icon" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
           </svg>
-          <span>ShopHub</span>
+          <span>KING TECH</span>
         </router-link>
 
-        <nav class="nav-links">
-          <router-link to="/dashboard/products" class="nav-link" active-class="active">Shop</router-link>
-          <router-link to="/dashboard/cart" class="nav-link" active-class="active">
-            Cart
-            <span v-if="cartCount" class="cart-pill">{{ cartCount }}</span>
-          </router-link>
-          <router-link to="/dashboard/orders" class="nav-link" active-class="active">Orders</router-link>
-        </nav>
+  <nav class="nav-links">
+           <router-link to="/dashboard/products" class="nav-link" active-class="active">Shop</router-link>
+           <router-link to="/dashboard/cart" class="nav-link" active-class="active">
+             Cart
+             <span v-if="cartCount" class="cart-pill">{{ cartCount }}</span>
+           </router-link>
+           <router-link to="/dashboard/orders" class="nav-link" active-class="active">Orders</router-link>
+           <router-link to="/dashboard/profile" class="nav-link" active-class="active">Profile</router-link>
+         </nav>
 
         <div class="nav-actions">
           <div class="search-box">
@@ -59,7 +60,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-
+import logo from '../public/images/image.png';
 const router = useRouter()
 const searchQuery = ref('')
 const products = ref<any[]>([])
@@ -252,7 +253,7 @@ onMounted(async () => {
   gap: 0.4rem;
   min-height: 40px;
   padding: 0.5rem 0.9rem;
-  border-radius: 0.5rem;
+  /* border-radius: 0.5rem; */
   color: #475569;
   text-decoration: none;
   font-weight: 700;
@@ -266,9 +267,11 @@ onMounted(async () => {
 }
 
 .nav-link.active {
-  background: #0f172a;
-  color: #ffffff;
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16);
+  /* background: #066c64; */
+  color: #066c64;
+  border-bottom: #066c64 3px solid;
+
+  /* box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16); */
 }
 
 .cart-pill {
@@ -295,8 +298,9 @@ onMounted(async () => {
 
 .search-box {
   position: relative;
-  max-width: 340px;
-  width: 100%;
+  /* max-width: 340px; */
+  
+  width: 80%;
 }
 
 .search-icon {
@@ -311,7 +315,7 @@ onMounted(async () => {
 
 .search-box input {
   width: 100%;
-  min-height: 42px;
+  min-height: 20px;
   padding: 0.6rem 0.75rem 0.6rem 2.25rem;
   border: 1px solid #dbe3ef;
   border-radius: 0.5rem;
@@ -331,6 +335,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding-left: 50px;
 }
 
 .avatar-sm {
