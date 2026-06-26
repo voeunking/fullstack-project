@@ -17,10 +17,6 @@
           <small v-if="featuredProduct">${{ featuredProduct.price }}</small>
           <small v-else>New arrivals</small>
         </div>
-        <div class="showcase-card mini">
-          <span>{{ products.length }}</span>
-          <small>Products ready</small>
-        </div>
       </div>
     </section>
 
@@ -49,16 +45,8 @@
     </div>
 
     <div v-else class="products-layout">
-      <FilterSidebar :categories="categories" :selected="selectedCategory" @change="setCategory" />
-
       <div class="products-panel">
-        <div class="products-toolbar">
-          <div>
-            <span class="results-count">{{ filteredProducts.length }} items</span>
-            <p>{{ selectedCategory ? 'Filtered products for your category' : 'Top products selected for you' }}</p>
-          </div>
-          <button class="featured-chip" type="button">Best value first</button>
-        </div>
+        <FilterSidebar :categories="categories" :selected="selectedCategory" @change="setCategory" />
 
         <div id="product-grid" class="products-grid">
           <ProductCard
@@ -129,28 +117,29 @@ const addToCompare = (product: any) => {
 }
 
 .shop-hero {
-  min-height: 320px;
+  min-height: 340px;
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-  gap: 2rem;
+  gap: var(--spacing-2xl);
   align-items: stretch;
-  margin-bottom: 1rem;
-  padding: 2.25rem;
-  border-radius: 0.5rem;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-xl);
   background:
-    linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(19, 78, 74, 0.86)),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(19, 78, 74, 0.88)),
     url('https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1400&q=80') center/cover;
-  color: #ffffff;
+  color: var(--surface);
   overflow: hidden;
   position: relative;
+  box-shadow: var(--shadow-2xl);
 }
 
 .shop-hero::after {
   content: "";
   position: absolute;
-  inset: auto 2rem 0 2rem;
+  inset: auto var(--spacing-xl) 0 var(--spacing-xl);
   height: 1px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .hero-copy {
@@ -164,135 +153,134 @@ const addToCompare = (product: any) => {
 
 .eyebrow {
   width: fit-content;
-  padding: 0.35rem 0.65rem;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  font-size: 0.78rem;
-  font-weight: 800;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: var(--text-xs);
+  font-weight: var(--font-black);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(8px);
 }
 
 .hero-copy h1 {
   max-width: 680px;
-  margin: 0.85rem 0 0.75rem;
-  font-size: clamp(2rem, 5vw, 4.4rem);
-  line-height: 1;
-  font-weight: 900;
-  letter-spacing: 0;
+  margin: var(--spacing-md) 0 var(--spacing-sm);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.05;
+  font-weight: var(--font-black);
+  letter-spacing: -0.02em;
 }
 
 .hero-copy p {
   max-width: 560px;
   margin: 0;
-  color: #dbeafe;
-  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: var(--text-base);
   line-height: 1.7;
+  font-weight: var(--font-medium);
 }
 
 .hero-actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
 }
 
 .primary-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
-  padding: 0.75rem 1.2rem;
-  border-radius: 0.5rem;
-  background: #f97316;
-  color: #ffffff;
+  min-height: 48px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  background: var(--accent-500);
+  color: var(--surface);
   text-decoration: none;
-  font-weight: 800;
-  box-shadow: 0 16px 30px rgba(249, 115, 22, 0.35);
+  font-weight: var(--font-black);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-base);
+}
+
+.primary-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  background: var(--accent-600);
 }
 
 .trust-note {
-  color: #e2e8f0;
-  font-size: 0.9rem;
-  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
 }
 
 .hero-showcase {
   position: relative;
   z-index: 1;
-  min-height: 250px;
+  min-height: 260px;
 }
 
 .showcase-card {
   position: absolute;
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.94);
-  color: #0f172a;
-  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-2xl);
+  backdrop-filter: blur(12px);
 }
 
 .showcase-card.main {
   right: 0;
-  bottom: 1rem;
+  bottom: var(--spacing-md);
   width: min(100%, 320px);
-  padding: 1.5rem;
+  padding: var(--spacing-lg);
 }
 
 .showcase-card.main strong {
   display: block;
-  margin: 0.6rem 0 0.35rem;
-  font-size: 1.35rem;
+  margin: var(--spacing-sm) 0 var(--spacing-xs);
+  font-size: var(--text-xl);
   line-height: 1.2;
-  font-weight: 900;
+  font-weight: var(--font-black);
 }
 
 .showcase-card.main small {
-  color: #0f766e;
-  font-weight: 900;
-  font-size: 1.1rem;
+  color: var(--primary-600);
+  font-weight: var(--font-black);
+  font-size: var(--text-lg);
 }
 
 .deal-label {
-  color: #c2410c;
-  font-size: 0.76rem;
-  font-weight: 900;
+  color: var(--accent-700);
+  font-size: var(--text-xs);
+  font-weight: var(--font-black);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.showcase-card.mini {
-  left: 0;
-  top: 2rem;
-  width: 150px;
-  padding: 1rem;
-}
-
-.showcase-card.mini span {
-  display: block;
-  font-size: 2.4rem;
-  line-height: 1;
-  color: #0f766e;
-  font-weight: 900;
-}
-
-.showcase-card.mini small {
-  color: #64748b;
-  font-weight: 800;
-}
 
 .store-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 2rem;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-2xl);
 }
 
 .store-strip div {
-  padding: 1rem;
-  border: 1px solid rgba(203, 213, 225, 0.8);
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.store-strip div:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .store-strip strong,
@@ -301,64 +289,30 @@ const addToCompare = (product: any) => {
 }
 
 .store-strip strong {
-  color: #0f172a;
-  font-weight: 900;
+  color: var(--text-primary);
+  font-weight: var(--font-black);
+  font-size: var(--text-sm);
 }
 
 .store-strip span {
-  margin-top: 0.2rem;
-  color: #64748b;
-  font-size: 0.86rem;
+  margin-top: var(--spacing-xs);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
 }
 
 .products-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 2rem;
+  display: block;
 }
 
 .products-panel {
   min-width: 0;
 }
 
-.products-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  padding: 0.9rem 1rem;
-  border: 1px solid rgba(203, 213, 225, 0.8);
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.88);
-}
-
-.results-count {
-  color: #0f172a;
-  font-weight: 900;
-}
-
-.products-toolbar p {
-  margin: 0.15rem 0 0;
-  color: #64748b;
-  font-size: 0.85rem;
-}
-
-.featured-chip {
-  min-height: 38px;
-  padding: 0.5rem 0.8rem;
-  border: 1px solid #fed7aa;
-  border-radius: 999px;
-  background: #fff7ed;
-  color: #c2410c;
-  font-weight: 900;
-  cursor: default;
-}
-
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--spacing-xl);
 }
 
 .state-center {
@@ -366,21 +320,22 @@ const addToCompare = (product: any) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem;
+  padding: var(--spacing-3xl);
   text-align: center;
-  background: white;
-  border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #e2e8f0;
-  border-top-color: #3b82f6;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-light);
+  border-top-color: var(--primary-500);
+  border-radius: var(--radius-full);
   animation: spin 0.8s linear infinite;
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-md);
 }
 
 @keyframes spin {
@@ -400,20 +355,30 @@ const addToCompare = (product: any) => {
   .store-strip {
     grid-template-columns: 1fr;
   }
+
+  .products-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @media (max-width: 640px) {
   .shop-hero {
-    padding: 1.5rem;
+    padding: var(--spacing-lg);
+    min-height: auto;
   }
 
   .hero-copy h1 {
-    font-size: 2.25rem;
+    font-size: 2rem;
   }
 
-  .products-toolbar {
-    align-items: flex-start;
-    flex-direction: column;
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .store-strip div {
+    padding: var(--spacing-sm);
   }
 }
 </style>

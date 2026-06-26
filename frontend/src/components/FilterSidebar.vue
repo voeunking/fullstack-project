@@ -36,73 +36,75 @@ const emit = defineEmits<{
 
 <style scoped>
 .filter-sidebar {
-  background: rgba(255, 255, 255, 0.88);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  border: 1px solid rgba(203, 213, 225, 0.82);
-  height: fit-content;
-  position: sticky;
-  top: 92px;
-  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border-light);
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
 }
 
 .filter-section h3 {
-  font-size: 0.875rem;
-  font-weight: 900;
-  color: #0f172a;
+  font-size: var(--text-base);
+  font-weight: var(--font-black);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .filter-section p {
-  margin: 0.25rem 0 0.85rem;
-  color: #64748b;
-  font-size: 0.82rem;
+  margin: var(--spacing-xs) 0 var(--spacing-md);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
 }
 
 .category-list {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
 }
 
 .cat-item {
   text-align: left;
-  min-height: 40px;
-  padding: 0.55rem 0.75rem;
-  background: none;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  color: #475569;
+  min-height: 44px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--slate-50);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.15s;
-  font-weight: 800;
+  transition: all var(--transition-fast);
+  font-weight: var(--font-bold);
 }
 
 .cat-item:hover {
-  background: #ecfeff;
-  color: #0f766e;
+  background: var(--primary-50);
+  color: var(--primary-700);
+  border-color: var(--primary-200);
 }
 
 .cat-item.active {
-  background: #0f766e;
-  color: white;
-  box-shadow: 0 10px 20px rgba(15, 118, 110, 0.18);
+  background: var(--primary-600);
+  color: var(--surface);
+  border-color: var(--primary-600);
+  box-shadow: var(--shadow-md);
 }
 
-@media (max-width: 960px) {
+@media (max-width: 640px) {
   .filter-sidebar {
-    position: static;
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-lg);
   }
 
   .category-list {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 0.25rem;
+    gap: var(--spacing-xs);
   }
 
   .cat-item {
-    white-space: nowrap;
+    min-height: 40px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--text-xs);
   }
 }
 </style>

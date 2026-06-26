@@ -5,22 +5,12 @@
     <div class="card-image">
       <img v-if="product.image" :src="backendUrl + '/storage/' + product.image" :alt="product.name" />
       <div v-else class="placeholder-img">{{ initials }}</div>
-<!-- 
+
       <div class="image-top-badges">
         <span v-if="product.discount_percent > 0" class="badge discount">New Deal -{{ product.discount_percent }}%</span>
         <span v-else-if="product.stock > 0 && product.stock < 5" class="badge stock-alert">Hurry! {{ product.stock }} left</span>
         <span v-else class="badge new-arrival">New Arrivals</span>
       </div>
-
-      <button
-        class="quick-view"
-        type="button"
-        :disabled="product.stock === 0"
-        @click="$emit('add-to-cart', product)"
-        :title="product.stock === 0 ? 'Sold out' : 'Quick add to cart'"
-      >
-        {{ product.stock === 0 ? 'Sold Out' : 'Buy Now' }}
-      </button> -->
     </div>
 
     <div class="card-body">
@@ -37,7 +27,7 @@
 
       <div class="price-section">
         <span v-if="product.discount_percent > 0" class="final-price">${{ finalPrice }}</span>
-        <span v-else class="price">${{ Number(product.price).toFixed(2) }}</span>
+        <span v-else class="price" >${{ Number(product.price).toFixed(2) }}</span>
 
         <span v-if="product.discount_percent > 0" class="original-price">${{ Number(product.price).toFixed(2) }}</span>
       </div>
@@ -90,279 +80,593 @@ const isInCompare = computed(() => false)
 </script>
 
 <style scoped>
-.product-card {
-  background: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+ .product-card {
   position: relative;
+  width: 100%;
+  max-width: 500px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(20px);
+  border-radius: 28px;
+  overflow: hidden;
+
+  border: 1px solid rgba(255,255,255,0.5);
+
+  box-shadow:
+    0 20px 40px rgba(15,23,42,.12),
+    inset 0 1px 0 rgba(255,255,255,.5);
+
+  transition: all .45s cubic-bezier(.2,.8,.2,1);
 }
 
-.card-glow {
-  position: absolute;
-  inset: -2px;
-  background: radial-gradient(circle at 20% 10%, rgba(20, 184, 166, 0.18), transparent 45%),
-    radial-gradient(circle at 90% 20%, rgba(249, 115, 22, 0.16), transparent 45%);
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  pointer-events: none;
-}
 
 .product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.14);
+
+  transform:
+    translateY(-14px)
+    scale(1.02);
+
+  box-shadow:
+    0 30px 70px rgba(15,23,42,.25);
 }
 
-.product-card:hover .card-glow {
-  opacity: 1;
+
+
+/* animated light */
+
+.card-glow {
+
+ position:absolute;
+
+ width:220px;
+ height:220px;
+
+ top:-100px;
+ right:-100px;
+
+ background:
+ linear-gradient(
+  135deg,
+  #6366f1,
+  #06b6d4,
+  #22c55e
+ );
+
+ filter:blur(60px);
+
+ opacity:.35;
+
 }
+
+
+
+/* image */
+
 
 .card-image {
-  height: 210px;
-  background:
-    linear-gradient(135deg, rgba(20, 184, 166, 0.18), rgba(249, 115, 22, 0.14)),
-    #f8fafc;
-  position: relative;
-  overflow: hidden;
+
+ position:relative;
+
+ height:260px;
+
+ overflow:hidden;
+
+ background:
+ linear-gradient(
+ 135deg,
+ #f8fafc,
+ #eef2ff
+ );
+
 }
+
+
 
 .card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.35s ease;
+
+ width:100%;
+ height:100%;
+
+ object-fit:cover;
+
+ transition:.6s;
+
 }
 
-.product-card:hover .card-image img {
-  transform: scale(1.06);
+
+
+.product-card:hover img {
+
+ transform:scale(1.15);
+
 }
 
-.placeholder-img {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.7rem;
-  font-weight: 800;
-  color: #0f766e;
+
+
+
+/* image dark overlay */
+
+
+.card-image::after {
+
+content:"";
+
+position:absolute;
+
+inset:0;
+
+background:
+linear-gradient(
+to top,
+rgba(0,0,0,.35),
+transparent 45%
+);
+
+opacity:0;
+
+transition:.3s;
+
 }
+
+
+
+.product-card:hover .card-image::after{
+
+opacity:1;
+
+}
+
+
+
+/* badges */
+
 
 .image-top-badges {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  right: 0.75rem;
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  pointer-events: none;
+
+position:absolute;
+
+top:18px;
+left:18px;
+
+display:flex;
+flex-direction:column;
+gap:10px;
+
+z-index:3;
+
 }
+
+
 
 .badge {
-  pointer-events: none;
-  padding: 0.35rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 900;
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
-  white-space: nowrap;
+
+padding:8px 14px;
+
+border-radius:999px;
+
+font-size:12px;
+
+font-weight:800;
+
+letter-spacing:.3px;
+
+color:white;
+
+box-shadow:
+0 8px 20px rgba(0,0,0,.2);
+
+backdrop-filter:blur(10px);
+
 }
+
+
 
 .discount {
-  background: #f97316;
-  color: #ffffff;
+
+background:
+linear-gradient(
+135deg,#ef4444,#fb7185
+);
+
 }
+
 
 .stock-alert {
-  background: #fef3c7;
-  color: #d97706;
+
+background:
+linear-gradient(
+135deg,#f59e0b,#f97316
+);
+
 }
+
 
 .new-arrival {
-  background: #d1fae5;
-  color: #065f46;
+
+background:
+linear-gradient(
+135deg,#10b981,#14b8a6
+);
+
 }
 
-.quick-view {
-  position: absolute;
-  bottom: 0.75rem;
-  left: 0.75rem;
-  right: 0.75rem;
-  min-height: 42px;
-  padding: 0.65rem;
-  border-radius: 0.75rem;
-  border: none;
-  background: linear-gradient(135deg, #0f172a, #134e4a);
-  color: #ffffff;
-  font-weight: 950;
-  cursor: pointer;
-  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.20);
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
 
-/* .product-card:hover .quick-view {
-  opacity: 1;
-  transform: translateY(0);
-} */
 
-.quick-view:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
+/* content */
+
 
 .card-body {
-  padding: 1.05rem 1rem 1rem;
+
+padding:24px;
+
 }
+
+
+
 
 .card-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:14px;
+
 }
+
+
 
 .category {
-  font-size: 0.75rem;
-  color: #0f766e;
-  text-transform: uppercase;
-  letter-spacing: 0;
-  font-weight: 950;
+
+background:#eef2ff;
+
+color:#4f46e5;
+
+padding:6px 12px;
+
+border-radius:999px;
+
+font-size:12px;
+
+font-weight:800;
+
 }
+
+
+
 
 .rating {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 999px;
-  background: #fef3c7;
-  color: #92400e;
-  font-size: 0.75rem;
-  font-weight: 900;
+
+display:flex;
+
+align-items:center;
+
+gap:5px;
+
+background:#fff7ed;
+
+padding:5px 10px;
+
+border-radius:20px;
+
 }
+
+
 
 .stars {
-  letter-spacing: -0.02em;
-  font-size: 0.82rem;
+
+color:#f59e0b;
+
+letter-spacing:2px;
+
 }
+
+
 
 .rating-num {
-  font-weight: 950;
+
+font-weight:700;
+
+font-size:13px;
+
 }
+
+
+
+
+
+/* title */
+
 
 .product-title {
-  min-height: 2.6rem;
-  font-size: 1.05rem;
-  line-height: 1.25;
-  font-weight: 950;
-  color: #0f172a;
-  margin: 0.35rem 0 0.15rem;
+
+font-size:22px;
+
+font-weight:900;
+
+color:#0f172a;
+
+margin:12px 0;
+
+line-height:1.3;
+
+
+display:-webkit-box;
+
+-webkit-line-clamp:2;
+
+-webkit-box-orient:vertical;
+
+overflow:hidden;
+
 }
+
+
+
+/* price */
+
 
 .price-section {
-  display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  margin: 0.55rem 0;
+
+/* display:flex; */
+
+/* align-items:center; */
+
+/* gap:12px; */
+
+/* margin:15px 0; */
+
 }
 
+
+
+.final-price,
 .price {
-  font-size: 1.3rem;
-  font-weight: 950;
-  color: #0f172a;
+
+
+font-size:20px;
+
+font-weight:500;
+
+
+
+background:
+linear-gradient(
+90deg,#3a68cc,#7c3aed
+);
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
 }
 
-.final-price {
-  font-size: 1.3rem;
-  font-weight: 950;
-  color: #0f766e;
-}
+
 
 .original-price {
-  font-size: 0.875rem;
-  color: #94a3b8;
-  text-decoration: line-through;
+
+font-size:15px;
+
+color:#94a3b8;
+
+text-decoration:line-through;
+
 }
+
+
+
+/* description */
+
 
 .desc {
-  font-size: 0.8rem;
-  color: #64748b;
-  margin: 0.5rem 0;
-  line-height: 1.4;
-  min-height: 2.25rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+
+font-size:14px;
+
+color:#64748b;
+
+line-height:1.7;
+
+margin-bottom:18px;
+
+
+display:-webkit-box;
+
+-webkit-line-clamp:2;
+
+-webkit-box-orient:vertical;
+
+overflow:hidden;
+
 }
+
+
+
+
+
+/* specs */
+
 
 .specs {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.35rem;
-  font-size: 0.75rem;
-  color: #334155;
-  margin: 0.65rem 0;
+
+display:flex;
+
+gap:8px;
+
+flex-wrap:wrap;
+
+margin-bottom:20px;
+
 }
+
+
 
 .specs span {
-  padding: 0.35rem 0.5rem;
-  border-radius: 0.35rem;
-  background: #f8fafc;
-  font-weight: 800;
+
+padding:8px 12px;
+
+background:#f8fafc;
+
+border-radius:12px;
+
+font-size:12px;
+
+font-weight:700;
+
+color:#475569;
+
+border:1px solid #e2e8f0;
+
 }
+
+
+
+
+/* buttons */
+
 
 .card-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.95rem;
+
+display:flex;
+
+gap:12px;
+
 }
+
+
 
 .add-btn {
-  flex: 1;
-  min-height: 42px;
-  padding: 0.65rem;
-  background: #0f766e;
-  color: white;
-  border: none;
-  border-radius: 0.75rem;
-  font-weight: 950;
-  cursor: pointer;
-  box-shadow: 0 12px 22px rgba(15, 23, 42, 0.12);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+flex:1;
+/* padding:1px; */
+
+/* height:52px; */
+
+border:none;
+border-radius:16px;
+
+
+background:
+linear-gradient(
+135deg,
+#2563eb,
+#7c3aed
+);
+
+
+color:white;
+
+font-weight:700;
+
+font-size:15px;
+
+cursor:pointer;
+
+
+box-shadow:
+0 12px 25px rgba(79,70,229,.35);
+
+
+transition:.3s;
+
 }
 
-.add-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 16px 28px rgba(15, 23, 42, 0.18);
+
+
+.add-btn:hover {
+
+transform:translateY(-3px);
+
+box-shadow:
+0 18px 35px rgba(79,70,229,.45);
+
 }
+
+
+
 
 .add-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+
+background:#94a3b8;
+
+box-shadow:none;
+
 }
 
+
+
+/* compare button */
+
+
 .compare-btn {
-  width: 44px;
-  min-width: 44px;
-  min-height: 42px;
-  padding: 0.5rem;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.15s ease;
+
+width:52px;
+
+height:42px;
+
+border-radius:16px;
+
+border:2px solid #e2e8f0;
+
+background:white;
+
+color:#64748b;
+
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+
+cursor:pointer;
+
+transition:.3s;
+
 }
+
+
 
 .compare-btn:hover,
 .compare-btn.active {
-  background: #ccfbf1;
-  color: #0f766e;
+
+
+background:#0f172a;
+
+color:white;
+
+border-color:#0f172a;
+
+transform:rotate(5deg);
+
 }
+
+
+
+
+/* responsive */
+
+
+@media(max-width:600px){
+
+.product-card{
+
+max-width:100%;
+
+}
+
+.card-image{
+
+height:220px;
+
+}
+
+.product-title{
+
+font-size:20px;
+
+}
+
+} 
 </style>

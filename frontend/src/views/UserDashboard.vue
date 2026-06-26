@@ -10,13 +10,31 @@
         </router-link>
 
   <nav class="nav-links">
-           <router-link to="/dashboard/products" class="nav-link" active-class="active">Shop</router-link>
+           <router-link to="/dashboard/products" class="nav-link" active-class="active">
+             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+             </svg>
+             Shop
+           </router-link>
            <router-link to="/dashboard/cart" class="nav-link" active-class="active">
+             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+             </svg>
              Cart
              <span v-if="cartCount" class="cart-pill">{{ cartCount }}</span>
            </router-link>
-           <router-link to="/dashboard/orders" class="nav-link" active-class="active">Orders</router-link>
-           <router-link to="/dashboard/profile" class="nav-link" active-class="active">Profile</router-link>
+           <router-link to="/dashboard/orders" class="nav-link" active-class="active">
+             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+             </svg>
+             Orders
+           </router-link>
+           <router-link to="/dashboard/profile" class="nav-link" active-class="active">
+             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+             </svg>
+             Profile
+           </router-link>
          </nav>
 
         <div class="nav-actions">
@@ -199,93 +217,113 @@ onMounted(async () => {
 .user-dashboard {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(20, 184, 166, 0.16), transparent 30rem),
-    radial-gradient(circle at top right, rgba(249, 115, 22, 0.12), transparent 28rem),
-    linear-gradient(180deg, #f8fafc 0%, #eef2f7 48%, #f8fafc 100%);
-  color: #111827;
+    radial-gradient(circle at top left, rgba(20, 184, 166, 0.08), transparent 30rem),
+    radial-gradient(circle at top right, rgba(249, 115, 22, 0.06), transparent 28rem),
+    linear-gradient(180deg, var(--background-alt) 0%, var(--slate-100) 48%, var(--background-alt) 100%);
+  color: var(--text-primary);
 }
 
 .top-nav {
-  background: rgba(255, 255, 255, 0.9);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.06);
-  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(20px);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: var(--z-sticky);
 }
 
 .nav-inner {
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 1.5rem;
-  height: 68px;
+  padding: 0 var(--spacing-lg);
+  height: 72px;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: var(--spacing-xl);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
   text-decoration: none;
-  color: #0f172a;
-  font-weight: 800;
-  font-size: 1.25rem;
-  letter-spacing: 0;
+  color: var(--text-primary);
+  font-weight: var(--font-extrabold);
+  font-size: var(--text-xl);
+  letter-spacing: -0.02em;
+  transition: opacity var(--transition-fast);
+}
+
+.logo:hover {
+  opacity: 0.8;
 }
 
 .logo-icon {
-  width: 28px;
-  height: 28px;
-  color: #0f766e;
+  width: 32px;
+  height: 32px;
+  color: var(--primary-600);
 }
 
 .nav-links {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-xs);
 }
 
 .nav-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  min-height: 40px;
-  padding: 0.5rem 0.9rem;
-  /* border-radius: 0.5rem; */
-  color: #475569;
+  gap: var(--spacing-xs);
+  min-height: 44px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--text-secondary);
   text-decoration: none;
-  font-weight: 700;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
+  font-weight: var(--font-bold);
+  font-size: var(--text-sm);
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-md);
+  position: relative;
+}
+
+.nav-icon {
+  flex-shrink: 0;
 }
 
 .nav-link:hover {
-  background: #ecfeff;
-  color: #0f766e;
+  background: var(--primary-50);
+  color: var(--primary-700);
 }
 
 .nav-link.active {
-  /* background: #066c64; */
-  color: #066c64;
-  border-bottom: #066c64 3px solid;
+  color: var(--primary-700);
+  background: var(--primary-50);
+}
 
-  /* box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16); */
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: var(--primary-600);
+  border-radius: var(--radius-full);
 }
 
 .cart-pill {
-  min-width: 1.35rem;
-  height: 1.35rem;
-  padding: 0 0.35rem;
-  border-radius: 999px;
-  background: #f97316;
-  color: #ffffff;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--spacing-xs);
+  border-radius: var(--radius-full);
+  background: var(--accent-500);
+  color: var(--surface);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--font-black);
+  box-shadow: var(--shadow-sm);
 }
 
 .nav-actions {
@@ -293,118 +331,145 @@ onMounted(async () => {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-md);
 }
 
 .search-box {
   position: relative;
-  /* max-width: 340px; */
-  
-  width: 80%;
+  width: 100%;
+  max-width: 320px;
 }
 
 .search-icon {
   position: absolute;
-  left: 0.75rem;
+  left: var(--spacing-sm);
   top: 50%;
   transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  color: #94a3b8;
+  width: 18px;
+  height: 18px;
+  color: var(--text-tertiary);
+  pointer-events: none;
 }
 
 .search-box input {
   width: 100%;
-  min-height: 20px;
-  padding: 0.6rem 0.75rem 0.6rem 2.25rem;
-  border: 1px solid #dbe3ef;
-  border-radius: 0.5rem;
-  background: #ffffff;
-  font-size: 0.875rem;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 2.5rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  font-size: var(--text-sm);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+  color: var(--text-primary);
+}
+
+.search-box input::placeholder {
+  color: var(--text-tertiary);
 }
 
 .search-box input:focus {
   outline: none;
-  border-color: #0f766e;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.14);
+  border-color: var(--primary-500);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
 }
 
 .user-menu {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding-left: 50px;
+  gap: var(--spacing-sm);
+  padding-left: var(--spacing-lg);
 }
 
 .avatar-sm {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #0f766e, #f97316);
-  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary-600), var(--accent-500));
+  color: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  box-shadow: var(--shadow-md);
+  flex-shrink: 0;
 }
 
 .user-name {
-  font-size: 0.875rem;
-  color: #334155;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-weight: var(--font-bold);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .logout-sm {
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--text-tertiary);
   cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logout-sm:hover {
-  color: #ef4444;
-  background: #fef2f2;
+  color: var(--error);
+  background: var(--error-light);
 }
 
 .content {
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: var(--spacing-2xl) var(--spacing-lg);
 }
 
 @media (max-width: 900px) {
   .nav-inner {
     height: auto;
-    min-height: 64px;
+    min-height: 68px;
     flex-wrap: wrap;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+    padding-top: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    gap: var(--spacing-md);
   }
 
   .nav-actions {
     width: 100%;
     justify-content: space-between;
+    order: 3;
+  }
+
+  .nav-links {
+    order: 2;
+    width: 100%;
+  }
+
+  .search-box {
+    max-width: none;
+    order: 1;
+    width: 100%;
   }
 }
 
 @media (max-width: 640px) {
   .nav-inner {
-    padding-inline: 1rem;
+    padding-inline: var(--spacing-md);
   }
 
   .nav-links {
-    order: 3;
-    width: 100%;
-    overflow-x: auto;
+    gap: var(--spacing-xs);
   }
 
-  .search-box {
-    max-width: none;
+  .nav-link {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--text-xs);
   }
 
   .user-name {
@@ -412,7 +477,16 @@ onMounted(async () => {
   }
 
   .content {
-    padding: 1.25rem 1rem;
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .logo {
+    font-size: var(--text-lg);
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
   }
 }
 </style>

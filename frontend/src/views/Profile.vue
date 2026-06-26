@@ -13,9 +13,17 @@
     <div v-else class="profile-content">
       <div class="profile-card">
         <div class="profile-avatar">
-          <img v-if="user?.avatar" :src="user.avatar" :alt="user?.name || 'User'" />
-          <div v-else class="avatar-placeholder">{{ userInitials }}</div>
-          <button class="change-avatar-btn" @click="openAvatarModal">Change Avatar</button>
+          <div class="avatar-wrapper" @click="$refs.avatarInput.click()">
+            <img v-if="avatarPreview || user?.avatar" :src="avatarPreview || (user?.avatar ? backendUrl + '/storage/' + user.avatar : '')" :alt="user?.name || 'User'" />
+            <div v-else class="avatar-placeholder">{{ userInitials }}</div>
+            <div class="avatar-overlay">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+          </div>
+          <input ref="avatarInput" type="file" accept="image/*" @change="handleAvatarChange" class="hidden" />
         </div>
 
         <form @submit.prevent="updateProfile" class="profile-form">
@@ -61,7 +69,9 @@ const loading = ref(false)
 const loadingInitial = ref(false)
 const message = ref('')
 const error = ref('')
-
+const avatarInput = ref<HTMLInputElement | null>(null)
+const avatarPreview = ref('')
+const avatarFile = ref<File | null>(null)
 
 const backendUrl = (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
 
@@ -69,8 +79,7 @@ const form = ref({
   name: '',
   email: '',
   phone: '',
-  address: '',
-  avatar: ''
+  address: ''
 })
 
 const userInitials = computed(() => {
@@ -78,10 +87,16 @@ const userInitials = computed(() => {
   return n.split(' ').map((p: string) => p[0]).join('').toUpperCase().slice(0, 2)
 })
 
-const openAvatarModal = () => {
-  const url = prompt('Enter avatar URL:', form.value.avatar)
-  if (url !== null) {
-    form.value.avatar = url
+const handleAvatarChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (file) {
+    avatarFile.value = file
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      avatarPreview.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
   }
 }
 
@@ -92,11 +107,35 @@ const updateProfile = async () => {
 
   try {
     const token = localStorage.getItem('token')
-    const res = await axios.put(`${backendUrl}/api/profile`, form.value, {
-      headers: { Authorization: `Bearer ${token}` }
+    const formData = new FormData()
+    
+    Object.keys(form.value).forEach(key => {
+      formData.append(key, form.value[key as keyof typeof form.value])
     })
-    user.value = res.data?.data ?? res.data
+    
+    if (avatarFile.value) {
+      formData.append('avatar', avatarFile.value)
+    }
+
+    const res = await axios.put(`${backendUrl}/api/profile`, formData, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    
+    const data = res.data?.data ?? res.data
+    user.value = data
     message.value = 'Profile updated successfully!'
+    
+    // Clear avatar preview and file after successful upload
+    avatarPreview.value = ''
+    avatarFile.value = null
+    
+    // Reset file input
+    if (avatarInput.value) {
+      avatarInput.value.value = ''
+    }
   } catch (err: any) {
     error.value = err.response?.data?.message || 'Failed to update profile'
   } finally {
@@ -120,8 +159,7 @@ onMounted(async () => {
       name: data?.name || '',
       email: data?.email || '',
       phone: data?.phone || '',
-      address: data?.address || '',
-      avatar: data?.avatar || ''
+      address: data?.address || ''
     }
   } catch (err) {
     console.error('Failed to load profile', err)
@@ -224,6 +262,13 @@ onMounted(async () => {
   gap: 10px;
 }
 
+.avatar-wrapper {
+  position: relative;
+  cursor: pointer;
+  width: 112px;
+  height: 112px;
+}
+
 .profile-avatar img {
   width: 112px;
   height: 112px;
@@ -233,6 +278,11 @@ onMounted(async () => {
   box-shadow:
     0 18px 40px rgba(2, 132, 199, 0.18),
     0 6px 18px rgba(15, 23, 42, 0.08);
+  transition: filter 0.2s ease;
+}
+
+.avatar-wrapper:hover .profile-avatar img {
+  filter: brightness(0.8);
 }
 
 .avatar-placeholder {
@@ -253,26 +303,34 @@ onMounted(async () => {
   box-shadow:
     0 18px 40px rgba(2, 132, 199, 0.18),
     0 6px 18px rgba(15, 23, 42, 0.08);
+  transition: filter 0.2s ease;
 }
 
-.change-avatar-btn {
-  position: relative;
-  z-index: 1;
-  padding: 10px 16px;
-  border: 1px solid rgba(254, 215, 170, 0.95);
+.avatar-wrapper:hover .avatar-placeholder {
+  filter: brightness(0.8);
+}
+
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
   border-radius: 999px;
-  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
-  color: #c2410c;
-  font-weight: 850;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: white;
+  border: 4px solid rgba(255, 255, 255, 0.95);
 }
 
-.change-avatar-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 24px rgba(194, 65, 12, 0.18);
-  background: linear-gradient(180deg, #ffedd5 0%, #ffffff 100%);
+.avatar-wrapper:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.avatar-overlay svg {
+  width: 24px;
+  height: 24px;
 }
 
 .profile-left .mini {
