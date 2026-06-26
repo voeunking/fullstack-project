@@ -8,18 +8,16 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
+
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         try {
             $products = Product::with('category')->get();
             return response()->json([
                 'success'=>true,
-                'message'=>'All products get successfully!',
+                'message'=>'All products loaded successfully!',
                 'data'=> $products
             ],Response::HTTP_OK);
         } catch (\Exception $e) {
@@ -31,108 +29,95 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
-        {
-            $validator = Validator::make($request->all(),[
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string|max:1000',
-                'price' => 'required|numeric|min:0',
-                'category_id' => 'required|exists:categories,id',
-                'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            ]);
-            if($validator->fails()){
-                return response()->json([
-                    'success'=>false,
-                    'message'=>'Validation faild',
-                    'error'=>$validator->errors()
-
-                ]);
-            }
-
-            $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('products', 'public');
-            }
-
-            $product = Product::create($validator->validated());
+    {
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'price' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'stock' => 'nullable|integer|min:0',
+            'discount_percent' => 'nullable|numeric|min:0|max:100',
+        ]);
+        if($validator->fails()){
             return response()->json([
-                'success' => true,
-                'message' => 'Product created successfully',
-                'data' => $product
+                'success'=>false,
+                'message'=>'Validation failed',
+                'error'=>$validator->errors()
             ]);
+        }
 
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+        }
+
+        $product = Product::create(array_merge($validator->validated(), ['image' => $imagePath]));
+        return response()->json([
+            'success' => true,
+            'message' => 'Product created successfully',
+            'data' => $product
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        $products = Product::find($id);
-        if(!$products){
+        $product = Product::with('category')->find($id);
+        if(!$product){
             return response()->json([
-
-            'success'=>false,
-            'message'=>'Product id is not found'
+                'success'=>false,
+                'message'=>'Product not found'
             ],Response::HTTP_NOT_FOUND);
         }
         return response()->json([
             'success'=>true,
-            'message'=>'Successfully',
-            'data'=>$products
-
+            'message'=>'Product found',
+            'data'=>$product
         ],Response::HTTP_OK);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-         $validator = Validator::make($request->all(),[
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string|max:1000',
-                'price' => 'required|numeric|min:0',
-                'category_id' => 'required|exists:categories,id',
-                'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            ]);
-            if($validator->fails()){
-                return response()->json([
-                    'success'=>false,
-                    'message'=>'Validation faild',
-                    'error'=>$validator->errors()
-
-                ]);
-            }
-
-            $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('products', 'public');
-            }
-            $product= Product::find($id);
-
-            $product->update($validator->validated());
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'price' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'stock' => 'nullable|integer|min:0',
+            'discount_percent' => 'nullable|numeric|min:0|max:100',
+        ]);
+        if($validator->fails()){
             return response()->json([
-                'success' => true,
-                'message' => 'Product created successfully',
-                'data' => $product
+                'success'=>false,
+                'message'=>'Validation failed',
+                'error'=>$validator->errors()
             ]);
+        }
+
+        $product = Product::find($id);
+        $product->update($validator->validated());
+        return response()->json([
+            'success' => true,
+            'message' => 'Product updated successfully',
+            'data' => $product
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        $products = Product::find($id);
-        $products->delete();
+        $product = Product::find($id);
+        if($product){
+            $product->delete();
+            return response()->json([
+                'success'=>true,
+                'message'=>'Product deleted'
+            ]);
+        }
         return response()->json([
-            'success'=>true,
-            'message'=>'Product id has been deleted!'
-
-        ],Response::HTTP_OK);
+            'success'=>false,
+            'message'=>'Product not found'
+        ], Response::HTTP_NOT_FOUND);
     }
 }

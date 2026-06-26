@@ -2,46 +2,55 @@
   <div class="orders-page">
     <div class="page-header">
       <h1>My Orders</h1>
-      <p class="sub">Track and manage your orders</p>
+      <p class="sub">Track your order status from checkout to delivery.</p>
     </div>
 
-    <div v-if="loading" class="state-center">
-      <div class="spinner"></div>
-      <p>Loading orders...</p>
-    </div>
-
-    <div v-else-if="orders.length === 0" class="state-center empty-orders">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="48" height="48">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-      </svg>
-      <p class="empty-msg">No orders yet</p>
-      <button @click="$emit('changePage', 'products')" class="shop-link">Start Shopping</button>
+    <div v-else-if="!orders.length" class="state-center">
+      <p>No orders yet</p>
+      <router-link to="/dashboard/products" class="shop-btn">Start Shopping</router-link>
     </div>
 
     <div v-else class="orders-list">
       <div v-for="order in orders" :key="order.id" class="order-card">
-        <div class="order-top">
+        <div class="order-header">
           <div>
             <span class="order-id">Order #{{ order.id }}</span>
-            <span class="order-date">{{ formatDate(order.created_at) }}</span>
+            <small>{{ formatDate(order.created_at) }}</small>
           </div>
-          <span :class="statusBadge(order.status)">{{ order.status }}</span>
+          <span :class="['status-badge', order.status]">{{ order.status }}</span>
+        </div>
+
+        <div class="order-progress" v-if="order.status !== 'cancelled'">
+          <div class="progress-step" :class="{ done: stepDone(order, 1), active: stepActive(order, 1) }">
+            <span class="step-dot"></span>
+            <span class="step-label">Order Placed</span>
+          </div>
+          <div class="progress-line" :class="{ done: stepDone(order, 2) }"></div>
+          <div class="progress-step" :class="{ done: stepDone(order, 2), active: stepActive(order, 2) }">
+            <span class="step-dot"></span>
+            <span class="step-label">Admin Confirmed</span>
+          </div>
+          <div class="progress-line" :class="{ done: stepDone(order, 3) }"></div>
+          <div class="progress-step" :class="{ done: stepDone(order, 3), active: stepActive(order, 3) }">
+            <span class="step-dot"></span>
+            <span class="step-label">Delivered</span>
+          </div>
+        </div>
+
+        <div v-if="order.status === 'cancelled'" class="cancel-banner">
+          This order has been cancelled.
         </div>
 
         <div class="order-items">
-          <div v-for="item in order.items" :key="item.product_id || item.id" class="order-row">
-            <div class="thumb">{{ getInitials(item.product?.name || item.name || 'P') }}</div>
-            <div class="info">
-              <span class="item-name">{{ item.product?.name || item.name || 'Product' }}</span>
-              <span class="item-qty">Qty: {{ item.quantity }}</span>
-            </div>
-            <span class="item-total">${{ (item.price * item.quantity).toFixed(2) }}</span>
+          <div v-for="item in order.items" :key="item.product_id" class="order-item">
+            <span>{{ item.quantity }} x {{ item.name }}</span>
+            <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
           </div>
         </div>
 
-        <div class="order-bottom">
-          <span class="pay-method">{{ order.payment_method === 'qr' ? 'QR Code' : 'Cash on Delivery' }}</span>
-          <span class="order-total">${{ order.total.toFixed(2) }}</span>
+        <div class="order-footer">
+          <span>Total: <strong>${{ Number(order.total).toFixed(2) }}</strong></span>
+          <span class="payment-method">{{ order.payment_method === 'qr' ? 'QR Payment' : 'Cash on Delivery' }}</span>
         </div>
       </div>
     </div>
@@ -49,41 +58,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
-defineProps<{ orders: any[] }>()
-defineEmits<{
-  changePage: [page: string]
-  refreshProducts: []
-}>()
+const props = defineProps<{ orders: any[] }>()
+const route = useRoute()
 
-const loading = ref(true)
+const formatDate = (d: string) => {
+  if (!d) return ''
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
-onMounted(async () => {
-  await new Promise(r => setTimeout(r, 400))
-  loading.value = false
-})
+const stepDone = (order: any, step: number) => {
+  if (order.status === 'cancelled') return false
+  if (step === 1) return true
+  if (step === 2) return order.status === 'confirmed' || order.status === 'completed'
+  if (step === 3) return order.status === 'completed'
+  return false
+}
 
-const formatDate = (d: string) => new Date(d).toLocaleDateString('en-US', {
-  year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-})
-
-const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-
-const statusBadge = (s: string) => {
-  const map: any = {
-    pending: 'badge badge-pending',
-    processing: 'badge badge-processing',
-    completed: 'badge badge-completed',
-    shipped: 'badge badge-processing',
-  }
-  return map[s?.toLowerCase()] || 'badge'
+const stepActive = (order: any, step: number) => {
+  if (order.status === 'cancelled') return false
+  if (step === 1) return false
+  if (step === 2) return order.status === 'pending' || order.status === 'processing'
+  if (step === 3) return order.status === 'confirmed'
+  return false
 }
 </script>
 
 <style scoped>
 .orders-page {
-  max-width: 900px;
+  max-width: 840px;
   margin: 0 auto;
 }
 
@@ -93,15 +97,14 @@ const statusBadge = (s: string) => {
 
 .page-header h1 {
   font-size: 1.75rem;
-  font-weight: 700;
-  color: #0f172a;
+  font-weight: 900;
   margin: 0;
+  color: #0f172a;
 }
 
 .sub {
   color: #64748b;
   margin: 0.25rem 0 0;
-  font-size: 0.875rem;
 }
 
 .state-center {
@@ -112,157 +115,190 @@ const statusBadge = (s: string) => {
   padding: 4rem;
   text-align: center;
   background: white;
-  border-radius: 1rem;
-  border: 1px solid #f1f5f9;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #e2e8f0;
-  border-top-color: #0f172a;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 1rem;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.empty-msg {
-  margin-top: 0.75rem;
-  color: #64748b;
-  font-size: 0.9375rem;
-}
-
-.shop-link {
-  margin-top: 1rem;
-  padding: 0.625rem 1.5rem;
-  background: #0f172a;
-  color: white;
-  border: none;
   border-radius: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  font-size: 0.875rem;
+  border: 1px solid #e2e8f0;
+}
+
+.shop-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  background: #0f766e;
+  color: white;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  font-weight: 900;
 }
 
 .orders-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .order-card {
   background: white;
-  border-radius: 1rem;
-  border: 1px solid #f1f5f9;
-  overflow: hidden;
+  border-radius: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
 }
 
-.order-top {
+.order-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.25rem;
-  background: #fafbfc;
-  border-bottom: 1px solid #f1f5f9;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .order-id {
-  font-weight: 600;
-  color: #0f172a;
-  font-size: 0.9375rem;
   display: block;
+  font-weight: 900;
+  color: #0f172a;
 }
 
-.order-date {
-  font-size: 0.8125rem;
+.order-header small {
   color: #64748b;
 }
 
-.badge {
+.status-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 900;
   text-transform: capitalize;
 }
 
-.badge-pending { background: #fef3c7; color: #92400e; }
-.badge-processing { background: #dbeafe; color: #1e40af; }
-.badge-completed { background: #d1fae5; color: #065f46; }
+.status-badge.pending { background: #fef3c7; color: #92400e; }
+.status-badge.processing { background: #dbeafe; color: #1e40af; }
+.status-badge.confirmed { background: #cffafe; color: #0e7490; }
+.status-badge.completed { background: #d1fae5; color: #065f46; }
+.status-badge.cancelled { background: #fee2e2; color: #991b1b; }
 
-.order-items {
-  padding: 1rem 1.25rem;
+.order-progress {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 1rem 0 1.25rem;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.progress-step {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.order-row {
-  display: flex;
   align-items: center;
-  gap: 0.75rem;
-}
-
-.thumb {
-  width: 40px;
-  height: 40px;
-  border-radius: 0.5rem;
-  background: linear-gradient(135deg, #e0e7ff, #f3e8ff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: #6366f1;
-  font-size: 0.625rem;
-  flex-shrink: 0;
-}
-
-.info {
+  gap: 0.35rem;
   flex: 1;
-  min-width: 0;
+  position: relative;
 }
 
-.item-name {
-  display: block;
-  font-weight: 500;
+.step-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  border: 2px solid #e2e8f0;
+}
+
+.progress-step.done .step-dot {
+  background: #0f766e;
+  border-color: #0f766e;
+}
+
+.progress-step.active .step-dot {
+  background: #ffffff;
+  border-color: #f97316;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+}
+
+.step-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.progress-step.done .step-label {
   color: #0f172a;
+}
+
+.progress-step.active .step-label {
+  color: #f97316;
+}
+
+.progress-line {
+  flex: 1;
+  height: 2px;
+  background: #e2e8f0;
+  margin: 0 0.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.progress-line.done {
+  background: #0f766e;
+}
+
+.cancel-banner {
+  margin: 0.75rem 0 1rem;
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  color: #991b1b;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
   font-size: 0.875rem;
 }
 
-.item-qty {
-  font-size: 0.8125rem;
-  color: #64748b;
-}
-
-.item-total {
-  font-weight: 600;
-  color: #0f172a;
-  font-size: 0.875rem;
-}
-
-.order-bottom {
+.order-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.875rem 1.25rem;
-  background: #fafbfc;
+  gap: 1rem;
+  padding-top: 0.75rem;
   border-top: 1px solid #f1f5f9;
-}
-
-.pay-method {
-  font-size: 0.8125rem;
   color: #64748b;
 }
 
-.order-total {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #0f172a;
+.order-footer strong {
+  color: #0f766e;
+  font-weight: 900;
+}
+
+.payment-method {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+
+@media (max-width: 560px) {
+  .order-header,
+  .order-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .step-label {
+    font-size: 0.65rem;
+  }
 }
 </style>

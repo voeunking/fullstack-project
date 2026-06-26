@@ -39,7 +39,7 @@ const submitForm = async () => {
   error.value = ''
 
   try {
-    const endpoint = `/api/${mode.value}`
+    const endpoint = `${backendBaseUrl}/api/${mode.value}`
     const payload = mode.value === 'login'
       ? { email: form.email, password: form.password }
       : { name: form.name, email: form.email, password: form.password, role: role.value }

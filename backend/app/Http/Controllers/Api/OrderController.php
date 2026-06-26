@@ -43,4 +43,31 @@ class OrderController extends Controller
             'message' => 'Order placed successfully',
         ], 201);
     }
+
+    public function adminIndex(Request $request)
+    {
+        $orders = Order::with('user')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders,
+        ]);
+    }
+
+    public function updateStatus(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|in:pending,processing,confirmed,completed,cancelled',
+        ]);
+
+        $order->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'data' => $order->fresh('user'),
+            'message' => 'Order status updated successfully',
+        ]);
+    }
 }

@@ -29,7 +29,7 @@
             <tbody class="divide-y divide-slate-200">
                 @forelse($categories as $category)
                     <tr class="hover:bg-slate-50">
-                        <td class="px-6 py-4">{{ $category->id }}</td>
+                        <td class="px-6 py-4">{{ $category->index+1 }}</td>
                         <td class="px-6 py-4 font-medium">{{ $category->name }}</td>
                         <td class="px-6 py-4 text-slate-600">{{ \Illuminate\Support\Str::limit($category->dec, 50) }}</td>
                         <td class="px-6 py-4">{{ $category->created_at->format('Y-m-d') }}</td>

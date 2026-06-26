@@ -29,9 +29,9 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
-                @forelse($products as $product)
+                @forelse($products as  $product)
                     <tr class="hover:bg-slate-50">
-                        <td class="px-6 py-4">{{ $product->id }}</td>
+                        <td class="px-6 py-4">{{ $product->index+1 }}</td>
                         <td class="px-6 py-4">
                             @if($product->image)
                                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-10 h-10 rounded object-cover">
