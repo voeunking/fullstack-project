@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 type AuthMode = 'login' | 'register'
@@ -63,7 +63,9 @@ const submitForm = async () => {
       return
     }
 
-    router.push('/dashboard/products')
+    router.push('/home')
+    localStorage.setItem('userRole', data.user?.role || '')
+
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Something went wrong.'
   } finally {
@@ -71,25 +73,28 @@ const submitForm = async () => {
   }
 }
 
-onMounted(() => {
+  onMounted(() => {
   const token = localStorage.getItem('token')
   console.log('App mounted, token present:', !!token)
   console.log('Current route:', route.path)
+  // Keep user on public home first after login.
+  // Home -> dashboard navigation is handled by the navbar buttons.
   if (token && route.path === '/') {
-    router.push('/dashboard/products')
+    // Ensure token stored during login keeps user on home.
   }
 })
 </script>
 
 <template>
-  <router-view v-if="route.path.startsWith('/dashboard')" />
+  <router-view />
 
-<main v-else class="auth-page">
+  <main class="auth-page" >
+
     <div class="auth-bg" aria-hidden="true"></div>
 
     <section class="auth-panel">
       <div class="auth-grid">
-        <div class="auth-hero">
+    <div class="auth-hero">
           <div class="hero-badge">KING TECH</div>
           <h1>Welcome back</h1>
           <p>Fast login, smooth checkout, and a clean dashboard experience.</p>

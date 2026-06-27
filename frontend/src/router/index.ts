@@ -1,69 +1,94 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import App from '../App.vue'
+
+const tokenExists = () => !!localStorage.getItem('token')
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/',
-      name: 'auth',
-      component: App,
+      path: '/home',
+      name: 'home',
+      component: () => import('../views/Home.vue'),
     },
+    {
+      path: '/',
+      name: 'root',
+      component: () => import('../App.vue'),
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('../App.vue'),
+    },
+
     {
       path: '/dashboard',
       component: () => import('../views/UserDashboard.vue'),
-children: [
-         {
-           path: '',
-           redirect: 'products',
-         },
-         {
-           path: 'products',
-           name: 'products',
-           component: () => import('../views/Products.vue'),
-         },
-         {
-           path: 'profile',
-           name: 'profile',
-           component: () => import('../views/Profile.vue'),
-           meta: { requiresAuth: true },
-         },
-         {
-           path: 'cart',
-           name: 'cart',
-           component: () => import('../views/Cart.vue'),
-           meta: { requiresAuth: true },
-         },
-         {
-           path: 'checkout',
-           name: 'checkout',
-           component: () => import('../views/Checkout.vue'),
-           meta: { requiresAuth: true },
-         },
-         {
-           path: 'orders',
-           name: 'orders',
-           component: () => import('../views/Orders.vue'),
-           meta: { requiresAuth: true },
-         },
-       ],
+      children: [
+
+        {
+          path: '',
+          redirect: 'products',
+        },
+        {
+          path: 'products',
+          name: 'products',
+          component: () => import('../views/Products.vue'),
+        },
+        {
+          path: 'profile',
+          name: 'profile',
+          component: () => import('../views/Profile.vue'),
+
+        },
+        {
+          path: 'cart',
+          name: 'cart',
+          component: () => import('../views/Cart.vue'),
+
+        },
+        {
+          path: 'checkout',
+          name: 'checkout',
+          component: () => import('../views/Checkout.vue'),
+
+        },
+        {
+          path: 'orders',
+          name: 'orders',
+          component: () => import('../views/Orders.vue'),
+
+        },
+      ],
     },
     {
-      path: '/:pathMatch(.*)',
+      path: '/:pathMatch(.*)*',
       redirect: '/dashboard/products',
     },
   ],
 })
 
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  if (to.meta.requiresAuth && !token) {
-    next('/')
-  } else if (to.path === '/' && token) {
-    next('/dashboard/products')
-  } else {
-    next()
+router.beforeEach((to) => {
+  const loggedIn = tokenExists()
+
+  // Logged-in users shouldn't see the login/register forms again.
+  if ((to.name === 'root' || to.name === 'register') && loggedIn) {
+    return '/dashboard/products'
   }
+
+  // Redirect bare /dashboard to either products (logged in) or home (logged out).
+  if (to.path === '/dashboard') {
+    return loggedIn ? '/dashboard/products' : '/'
+  }
+
+  // If user tries to access the dashboard directly but token is missing/invalid, bounce to home.
+  if (to.path.startsWith('/dashboard') && !loggedIn) {
+    return '/'
+  }
+
+  return true
 })
+
+
 
 export default router

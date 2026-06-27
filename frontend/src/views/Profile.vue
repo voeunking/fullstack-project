@@ -13,7 +13,7 @@
     <div v-else class="profile-content">
       <div class="profile-card">
         <div class="profile-avatar">
-          <div class="avatar-wrapper" @click="$refs.avatarInput.click()">
+          <div class="avatar-wrapper" @click="triggerAvatarPicker">
             <img v-if="avatarPreview || user?.avatar" :src="avatarPreview || (user?.avatar ? backendUrl + '/storage/' + user.avatar : '')" :alt="user?.name || 'User'" />
             <div v-else class="avatar-placeholder">{{ userInitials }}</div>
             <div class="avatar-overlay">
@@ -25,6 +25,7 @@
           </div>
           <input ref="avatarInput" type="file" accept="image/*" @change="handleAvatarChange" class="hidden" />
         </div>
+
 
         <form @submit.prevent="updateProfile" class="profile-form">
           <div class="field-group">
@@ -98,6 +99,10 @@ const handleAvatarChange = (e: Event) => {
     }
     reader.readAsDataURL(file)
   }
+}
+
+const triggerAvatarPicker = () => {
+  if (avatarInput.value) avatarInput.value.click()
 }
 
 const updateProfile = async () => {
