@@ -22,6 +22,8 @@ const form = reactive({
 
 const backendBaseUrl = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000').replace(/\/$/, '')
 
+const showAuth = computed(() => route.name === 'root' || route.name === 'register')
+
 const toggleMode = () => {
   mode.value = mode.value === 'login' ? 'register' : 'login'
   message.value = ''
@@ -88,7 +90,7 @@ const submitForm = async () => {
 <template>
   <router-view />
 
-  <main class="auth-page" >
+  <main v-if="showAuth" class="auth-page" >
 
     <div class="auth-bg" aria-hidden="true"></div>
 

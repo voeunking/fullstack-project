@@ -1,26 +1,14 @@
-# TODO - Admin Categories & Products Redesign
+# TODO
 
-## Planned file changes
-- [x] Update `backend/resources/views/admin/categories.blade.php` to a modern category-card grid + improved header/actions.
+## Login/Register UI redesign (Facebook + Google)
 
-- [x] Update `backend/resources/views/admin/products.blade.php` to a modern product-card grid/list with image preview, badges, and styled actions.
-
-- [x] Update `backend/resources/views/admin/categories-create.blade.php` to match the new visual theme (better header, inputs/buttons styling, preview panel).
-
-- [x] Update `backend/resources/views/admin/products-create.blade.php` to match the new visual theme (better header, inputs/buttons styling, image upload preview).
-
-- [ ] (Optional) Update `backend/resources/views/admin/categories-edit.blade.php` and `backend/resources/views/admin/products-edit.blade.php` styling to be consistent.
-
-
-
-
-## Status
-- [x] Gathered current admin Blade layouts + index/create views.
-- [x] Updated admin index/list: categories.blade.php
-- [x] Updated admin index/list: products.blade.php
-
-## Verification
-- [ ] Run/build to ensure Blade templates render without syntax errors.
-- [ ] Manually check in browser for responsive behavior (desktop/mobile).
+- [x] Inspect existing login/register UI entry points (Blade + Vue) and current styling approach (Tailwind/main.css).
+- [ ] Create shared authentication panel styles (cards, inputs, buttons, social buttons, divider).
+- [ ] Update admin login Blade design to match new Auth UI.
+- [ ] Add public login/register Blade pages (with social buttons) if they don’t exist.
+- [ ] If frontend Vue has auth screens, update them; otherwise keep to Blade.
+- [ ] Wire social buttons to existing OAuth flow endpoints OR implement placeholders that post to backend routes.
+- [ ] Keep layout responsive + accessible (focus states, aria labels, keyboard navigation).
+- [ ] Run frontend build / Laravel checks (as applicable) to ensure no broken imports or template errors.
 
 
