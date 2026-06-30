@@ -1,7 +1,9 @@
-# TODO
+# TODO - Contact Messages (Admin Inbox)
 
-- [ ] Add category filter UI on Products shop page
-  - [ ] Render `FilterSidebar` in `frontend/src/views/Products.vue`
-  - [ ] Bind sidebar selection to `selectedCategory` and ensure `filteredProducts` uses it
-  - [ ] Pass `categories` from props into `FilterSidebar`
+- [ ] Create migration + model + controller for storing contact messages and admin replies
+- [ ] Add admin routes + Blade pages: list messages + view/reply message
+- [ ] Update admin sidebar layout with link to messages inbox
+- [ ] Update Contact.vue to submit message to backend API/route
+- [ ] Add validation + flash success/error handling
+- [ ] Update database via artisan migrate
 
