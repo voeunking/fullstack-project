@@ -37,7 +37,7 @@ const emit = defineEmits<{
   remove: [id: number]
 }>()
 
-const backendUrl = 'http://127.0.0.1:8000'
+const backendUrl = (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
 const initials = computed(() => props.item.name?.split(' ')?.map((n: string) => n[0])?.join('')?.toUpperCase()?.slice(0, 2) || '?')
 const itemImage = computed(() => props.item.product?.image || props.item.image)
 

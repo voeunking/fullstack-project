@@ -1,777 +1,782 @@
 <template>
   <div class="home">
-
     <AppNavbar />
 
-    <!-- HERO -->
-    <section class="hero">
 
-      <div class="hero-inner">
-
+    <section class="hero-wrapper">
+      <div class="hero">
         <div class="hero-content">
-
-          <div class="eyebrow">
-            <span class="dot"></span>
-            KING TECH STORE — EST. 2018
-          </div>
-
           <h1>
-            Tech that earns
-            <span>its specs.</span>
+            Eat Organic & <br />
+            <span>Healthy Food</span>
           </h1>
-
-          <p class="lede">
-            Curated laptops, desktops, and accessories — benchmarked,
-            warrantied, and shipped from our own warehouse. No marketplace
-            roulette. No mystery sellers.
-          </p>
-
-          <div class="cta-row">
-            <button class="primary" @click="goToProducts">
-              Browse catalog
-              <span class="arrow">→</span>
-            </button>
-
-            <button class="secondary" @click="goToAuth">
-              Sign in
-            </button>
+          <p class="lede">Save up to 50% off on your first order</p>
+          <div class="subscribe-box">
+            <span class="mail-icon">✉️</span>
+            <input type="email" placeholder="Your email address" />
+            <button class="btn-primary">Subscribe</button>
           </div>
-
-          <div class="stat-row">
-            <div class="stat">
-              <span class="stat-num">500+</span>
-              <span class="stat-label">SKUs in stock</span>
-            </div>
-            <div class="stat">
-              <span class="stat-num">10,412</span>
-              <span class="stat-label">orders shipped</span>
-            </div>
-            <div class="stat">
-              <span class="stat-num">4.8 / 5</span>
-              <span class="stat-label">avg. rating</span>
-            </div>
-          </div>
-
         </div>
+        <div class="hero-image">
+          <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80" alt="Fresh organic groceries" />
+        </div>
+      </div>
+    </section>
 
-        <!-- SPEC CARD -->
-        <div class="spec-card">
+    <section class="featured-categories">
+      <div class="section-head">
+        <h2>Featured Categories</h2>
+        <div class="nav-tabs">
+          <!-- Keeps the UI look, but category data is dynamic -->
+          <a href="#" class="active">All</a>
+        </div>
+        <div v-if="loading" style="font-size: 12px; color: var(--text-muted);">Loading...</div>
+      </div>
 
-          <div class="spec-card-head">
-            <span class="spec-card-title">FEATURED — THIS WEEK</span>
-            <span class="spec-card-tag">IN STOCK</span>
+      <div class="category-carousel" v-if="featuredCategories.length">
+        <div class="cat-card" v-for="cat in featuredCategories" :key="cat.id">
+          <div class="cat-icon" :class="colorForIndex(catIndex(cat.id))">
+            <img
+              v-if="catImageUrl(cat)"
+              :src="catImageUrl(cat)"
+              :alt="cat.name"
+            />
+            <span v-else class="cat-placeholder">{{ (cat.name || '?').slice(0, 1).toUpperCase() }}</span>
           </div>
+          <h4>{{ cat.name }}</h4>
+          <span>{{ categoryProductCount(cat.id) }} items</span>
+        </div>
+      </div>
 
-          <div class="spec-card-product">
-            <div class="spec-thumb">💻</div>
-            <div>
-              <h2>Forge 14 Pro Laptop</h2>
-              <p>14" / 32GB RAM / 1TB NVMe</p>
-            </div>
+      <div v-else class="category-carousel" aria-busy="true">
+        <div class="cat-card">Loading...</div>
+      </div>
+    </section>
+
+    <section class="promo-banners">
+      <div class="promo-card bg-wheat">
+        <div class="promo-content">
+          <h3>Everyday Fresh &<br>Clean with Our<br>Products</h3>
+          <button class="btn-primary small">Shop Now</button>
+        </div>
+        <div class="promo-img">
+          <img src="https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?auto=format&fit=crop&w=300&q=80" alt="Fresh Produce" />
+        </div>
+      </div>
+      <div class="promo-card bg-lightblue">
+        <div class="promo-content">
+          <h3>Make your<br>Breakfast<br>Healthy and Easy</h3>
+          <button class="btn-primary small">Shop Now</button>
+        </div>
+        <div class="promo-img">
+          <img src="https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=300&q=80" alt="Healthy Juice" />
+        </div>
+      </div>
+      <div class="promo-card bg-tan">
+        <div class="promo-content">
+          <h3>The best Organic<br>Products Online</h3>
+          <button class="btn-primary small">Shop Now</button>
+        </div>
+        <div class="promo-img">
+          <img src="https://images.unsplash.com/photo-1528825871115-3581a5387915?auto=format&fit=crop&w=300&q=80" alt="Organic Greens" />
+        </div>
+      </div>
+    </section>
+
+    <section class="popular-products">
+      <div class="section-head">
+        <h2>Popular Products</h2>
+        <div class="nav-tabs">
+          <a href="#" class="active">All</a>
+        </div>
+      </div>
+
+      <div class="product-grid" v-if="popularProducts.length">
+        <div class="product-card" v-for="p in popularProducts" :key="p.id">
+          <div class="product-img">
+            <img
+              v-if="p.image"
+              :src="productImageUrl(p)"
+              :alt="p.name"
+            />
+            <img
+              v-else
+              src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80"
+              alt="Product"
+            />
           </div>
-
-          <dl class="spec-list">
-            <div class="spec-row">
-              <dt>Processor</dt>
-              <dd>12-core, up to 4.8GHz</dd>
-            </div>
-            <div class="spec-row">
-              <dt>Display</dt>
-              <dd>2.8K OLED, 120Hz</dd>
-            </div>
-            <div class="spec-row">
-              <dt>Battery</dt>
-              <dd>Up to 18 hrs</dd>
-            </div>
-            <div class="spec-row">
-              <dt>Warranty</dt>
-              <dd>3-year, parts &amp; labor</dd>
-            </div>
-          </dl>
-
-          <div class="spec-card-foot">
+          <span class="product-category">{{ p?.category?.name || 'Uncategorized' }}</span>
+          <h3>{{ p.name }}</h3>
+          <div class="price-row">
             <div class="price">
-              <span class="price-now">$1,349</span>
-              <span class="price-was">$1,599</span>
+              <span class="current">{{ formatPrice(p.price) }}</span>
+              <span class="old" v-if="p.discount_percent">{{ formatPrice(discountedOldPrice(p)) }}</span>
             </div>
-            <button class="card-btn" @click="goToProducts">
-              View product
-            </button>
+            <button class="btn-add">🛒 Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-grid" v-else>
+        <div class="product-card">Loading...</div>
+      </div>
+    </section>
+
+    <section class="daily-sales-section">
+      <div class="sales-layout">
+        <div class="sales-banner" v-if="popularProducts.length">
+          <h2>Bring <br>nature into <br>your home</h2>
+          <button class="btn-primary" type="button">Shop Now</button>
+        </div>
+
+        <div class="sales-content" v-if="popularProducts.length">
+          <div class="section-head" style="margin-bottom: 20px;">
+            <h2>Daily Sales</h2>
           </div>
 
+          <div class="sales-grid">
+            <div class="sale-card" v-for="p in popularProducts.slice(0, 4)" :key="p.id">
+              <div class="product-img">
+                <img v-if="p.image" :src="productImageUrl(p)" :alt="p.name" />
+                <img v-else src="https://images.unsplash.com/photo-1626200419199-391ae4be7a41?auto=format&fit=crop&w=400&q=80" alt="Product" />
+              </div>
+              <h3>{{ p.name }}</h3>
+              <div class="price">
+                <span class="current">{{ formatPrice(p.price) }}</span>
+              </div>
+              <button class="btn-primary full" type="button">🛒 Add to Cart</button>
+            </div>
+          </div>
         </div>
 
-      </div>
+        <div class="sales-content" v-else>
+          <div class="section-head" style="margin-bottom: 20px;">
+            <h2>Daily Sales</h2>
+          </div>
+          <div class="sales-grid">
+            <div class="sale-card">Loading...</div>
+          </div>
+        </div>
 
+        <!-- Static content removed (was accidentally left in and broke template tags) -->
+      </div>
     </section>
 
 
-    <!-- CATEGORIES -->
-    <section class="categories">
-
+    <section class="trending-stories">
       <div class="section-head">
-        <span class="section-kicker">01 / SHOP</span>
-        <h2>Shop by category</h2>
-        <p>Four ways to find exactly what your setup needs.</p>
+        <h2>Trending Stories</h2>
       </div>
-
-      <div class="category-grid">
-
-        <div class="category" @click="goToProducts">
-          <span class="cat-icon">💻</span>
-          <h3>Laptops</h3>
-          <p>Ultraportables to workstation-class rigs.</p>
-          <span class="cat-meta">128 products</span>
+      <div class="stories-grid">
+        <div class="story-card">
+          <div class="story-img">
+            <img src="https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=600&q=80" alt="Vegetables" />
+          </div>
+          <div class="story-meta">10 July 2024 • Healthy Tips</div>
+          <h3>Best way to keep your vegetables fresh and crispy for longer</h3>
+          <a href="#" class="read-more">Read More →</a>
         </div>
-
-        <div class="category" @click="goToProducts">
-          <span class="cat-icon">🖥️</span>
-          <h3>Desktops</h3>
-          <p>Pre-built towers and custom build kits.</p>
-          <span class="cat-meta">96 products</span>
+        <div class="story-card">
+          <div class="story-img">
+            <img src="https://images.unsplash.com/photo-1494390248081-4e521a5940db?auto=format&fit=crop&w=600&q=80" alt="Breakfast" />
+          </div>
+          <div class="story-meta">10 July 2024 • Recipe</div>
+          <h3>5 Quick and healthy breakfast ideas for busy mornings</h3>
+          <a href="#" class="read-more">Read More →</a>
         </div>
-
-        <div class="category" @click="goToProducts">
-          <span class="cat-icon">🎧</span>
-          <h3>Accessories</h3>
-          <p>Keyboards, mice, headsets, and cables.</p>
-          <span class="cat-meta">214 products</span>
+        <div class="story-card">
+          <div class="story-img">
+            <img src="https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?auto=format&fit=crop&w=600&q=80" alt="Farm" />
+          </div>
+          <div class="story-meta">10 July 2024 • Market News</div>
+          <h3>Meet our local farmers: A journey to the source of your food</h3>
+          <a href="#" class="read-more">Read More →</a>
         </div>
-
-        <div class="category" @click="goToProducts">
-          <span class="cat-icon">📱</span>
-          <h3>Devices</h3>
-          <p>Tablets, smartwatches, and smart home gear.</p>
-          <span class="cat-meta">87 products</span>
+        <div class="story-card">
+          <div class="story-img">
+            <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=600&q=80" alt="Nutrition" />
+          </div>
+          <div class="story-meta">10 July 2024 • Nutrition</div>
+          <h3>Why seasonal eating is better for your health and the planet</h3>
+          <a href="#" class="read-more">Read More →</a>
         </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- FEATURES -->
-    <section class="features">
-
-      <div class="section-head">
-        <span class="section-kicker">02 / WHY US</span>
-        <h2>Built for people who read the spec sheet</h2>
-        <p>Three things we don't compromise on, on every order.</p>
-      </div>
-
-      <div class="feature-grid">
-
-        <div class="feature">
-          <span class="feature-num">01</span>
-          <h3>Verified inventory</h3>
-          <p>
-            Every listing reflects real stock in our own warehouse —
-            checked daily, never drop-shipped from a third party.
-          </p>
-        </div>
-
-        <div class="feature">
-          <span class="feature-num">02</span>
-          <h3>Encrypted checkout</h3>
-          <p>
-            Payments run through PCI-compliant processing with 256-bit
-            encryption, so your card details never touch our servers.
-          </p>
-        </div>
-
-        <div class="feature">
-          <span class="feature-num">03</span>
-          <h3>2-day shipping</h3>
-          <p>
-            Orders placed before 3pm ship same day. Track every order
-            from warehouse to doorstep in your account.
-          </p>
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- TESTIMONIAL -->
-    <section class="testimonial">
-      <p class="quote">
-        “Ordered a desktop build on a Tuesday, had it benchmarked and
-        running by Thursday. Support actually knew the hardware.”
-      </p>
-      <div class="quote-author">
-        <span class="author-name">D. Okafor</span>
-        <span class="author-meta">Verified buyer — Desktop, Lagos</span>
       </div>
     </section>
 
-
-    <!-- CTA -->
-    <section class="bottom-banner">
-
-      <div class="banner-grid">
-        <span class="dot light"></span>
-        <span class="dot light"></span>
-        <span class="dot light"></span>
-      </div>
-
-      <h2>Your next setup is in stock.</h2>
-      <p>Create an account to track orders, save builds, and check out faster.</p>
-
-      <button @click="goToProducts">
-        Start shopping
-        <span class="arrow">→</span>
-      </button>
-
-    </section>
-
+    <AppFooter />
   </div>
 </template>
 
-
-
 <script setup lang="ts">
-
-import { useRouter } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import axios from 'axios'
 import AppNavbar from '../components/AppNavbar.vue'
+import AppFooter from '../components/AppFooter.vue'
 
-const router = useRouter()
+const backendUrl = (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
 
-const goToProducts = () => {
-  router.push('/dashboard/products')
+const categories = ref<any[]>([])
+const products = ref<any[]>([])
+const loading = ref(false)
+
+const fetchAll = async () => {
+  loading.value = true
+  try {
+    const [cRes, pRes] = await Promise.all([
+      axios.get(`${backendUrl}/api/categories`),
+      axios.get(`${backendUrl}/api/products`),
+    ])
+
+    categories.value = cRes.data?.data || []
+    products.value = pRes.data?.data || []
+  } finally {
+    loading.value = false
+  }
 }
 
-const goToAuth = () => {
-  const token = localStorage.getItem('token')
-  router.push(token ? '/dashboard/products' : '/register')
+const popularProducts = computed(() => products.value.slice(0, 10))
+const featuredCategories = computed(() => categories.value.slice(0, 8))
+
+const categoryColors = [
+  'bg-blue',
+  'bg-green',
+  'bg-orange',
+  'bg-yellow',
+  'bg-teal',
+  'bg-red',
+  'bg-purple',
+  'bg-lightgreen',
+  'bg-pink',
+]
+
+const catIndex = (id: number) => {
+  const idx = categories.value.findIndex((c) => c?.id === id)
+  return idx === -1 ? 0 : idx
 }
 
+const colorForIndex = (index: number) => {
+  const i = Math.abs(index) % categoryColors.length
+  return categoryColors[i]
+}
+
+const catImageUrl = (cat: any) => {
+  // Backend stores relative path in `image` (e.g. categories/xxx.jpg)
+  // and files are served from /storage.
+  return cat?.image ? `${backendUrl}/storage/${cat.image}` : null
+}
+
+const categoryProductCount = (categoryId: number) => {
+  return products.value.filter((p) => p?.category_id === categoryId || p?.category?.id === categoryId)
+    .length
+}
+
+const productImageUrl = (p: any) => {
+  // Products table stores: image path (e.g. products/xxxx.jpg) in `image`
+  // Backend stores files in `storage/app/public` with disk `public`.
+  if (!p?.image) return null
+  const base = (import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
+  return `${base}/storage/${p.image}`
+}
+
+const formatPrice = (price: any) => {
+  const num = Number(price)
+  if (Number.isNaN(num)) return '$0'
+  return `$${num.toFixed(2)}`
+}
+
+const discountedOldPrice = (p: any) => {
+  const price = Number(p?.price ?? 0)
+  const disc = Number(p?.discount_percent ?? 0)
+  const old = disc > 0 ? price / (1 - disc / 100) : price
+  return old
+}
+
+// Optional: if you decide to add discount fields later, update this section.
+
+
+onMounted(fetchAll)
 </script>
 
 
-
 <style scoped>
-
-/* ---------- Design tokens ---------- */
-.home{
-  --ink: #0b0e14;
-  --ink-soft: #4a5163;
-  --paper: #f7f7f5;
-  --panel: #ffffff;
-  --line: #e3e2dd;
-  --accent: #5b8def;
-  --accent-dim: #eef3fd;
-  --signal: #ff6a39;
-
-  --font-display: 'Sora', 'Space Grotesk', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
-
-  min-height: 100vh;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-body);
+/* ---------- Design Tokens ---------- */
+.home {
+  --primary: #046c4e;
+  --primary-hover: #03543f;
+  --primary-light: #def7ec;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --bg-main: #ffffff;
+  --bg-hero: #eef7f2;
+  --border-color: #f3f4f6;
+  --border-dark: #e5e7eb;
+  
+  --font-family: 'Quicksand', 'Inter', system-ui, sans-serif;
+  
+  font-family: var(--font-family);
+  color: var(--text-main);
+  background-color: var(--bg-main);
 }
 
-.home *{
+.home * {
   box-sizing: border-box;
 }
 
-.home h1,
-.home h2,
-.home h3{
-  font-family: var(--font-display);
-  letter-spacing: -0.02em;
-}
-
-
-/* ---------- Hero ---------- */
-.hero{
-  padding: 96px 24px 80px;
-  border-bottom: 1px solid var(--line);
-}
-
-.hero-inner{
-  max-width: 1180px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.15fr .85fr;
-  gap: 64px;
-  align-items: start;
-}
-
-@media (max-width: 900px){
-  .hero-inner{
-    grid-template-columns: 1fr;
-  }
-}
-
-.eyebrow{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--ink-soft);
-}
-
-.eyebrow .dot{
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--signal);
-  display: inline-block;
-}
-
-h1{
-  font-size: 56px;
-  line-height: 1.05;
-  font-weight: 700;
-  margin: 18px 0 20px;
-}
-
-h1 span{
-  color: var(--accent);
-}
-
-.lede{
-  font-size: 18px;
-  line-height: 1.65;
-  color: var(--ink-soft);
-  max-width: 520px;
+h1, h2, h3, h4 {
+  color: #111827;
   margin: 0;
-}
-
-.cta-row{
-  display: flex;
-  gap: 14px;
-  margin-top: 32px;
-}
-
-button{
-  cursor: pointer;
-  font-family: var(--font-body);
-  font-weight: 600;
-  border: none;
-}
-
-.primary{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 22px;
-  border-radius: 10px;
-  color: white;
-  background: var(--ink);
-  font-size: 15px;
-  transition: transform .15s ease, background .15s ease;
-}
-
-.primary:hover{
-  background: var(--accent);
-  transform: translateY(-2px);
-}
-
-.secondary{
-  padding: 14px 22px;
-  border-radius: 10px;
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--ink);
-  font-size: 15px;
-  transition: border-color .15s ease, background .15s ease;
-}
-
-.secondary:hover{
-  border-color: var(--ink);
-  background: var(--panel);
-}
-
-.arrow{
-  transition: transform .15s ease;
-}
-
-.primary:hover .arrow{
-  transform: translateX(3px);
-}
-
-.stat-row{
-  display: flex;
-  gap: 36px;
-  margin-top: 48px;
-  padding-top: 28px;
-  border-top: 1px solid var(--line);
-}
-
-.stat{
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.stat-num{
-  font-family: var(--font-mono);
-  font-size: 22px;
   font-weight: 700;
 }
 
-.stat-label{
-  font-size: 13px;
-  color: var(--ink-soft);
+/* ---------- Typography & Base ---------- */
+h2 {
+  font-size: 24px;
 }
-
-
-/* ---------- Spec card (signature element) ---------- */
-.spec-card{
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 0;
-  overflow: hidden;
-}
-
-.spec-card-head{
+.section-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 22px;
-  background: var(--ink);
+  margin-bottom: 24px;
+}
+.nav-tabs {
+  display: flex;
+  gap: 20px;
+}
+.nav-tabs a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.nav-tabs a.active, .nav-tabs a:hover {
+  color: var(--primary);
 }
 
-.spec-card-title{
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: #cfd6e6;
+/* ---------- Buttons ---------- */
+.btn-primary {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
-
-.spec-card-tag{
-  font-family: var(--font-mono);
-  font-size: 11px;
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+.btn-primary.small {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+.btn-primary.full {
+  width: 100%;
+  border-radius: 8px;
+}
+.btn-add {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
   font-weight: 700;
-  color: #7ee787;
-}
-
-.spec-card-product{
+  font-size: 14px;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 24px 22px 18px;
+  gap: 6px;
+}
+.btn-add:hover {
+  background-color: #c3eedb;
 }
 
-.spec-thumb{
-  font-size: 34px;
-  width: 56px;
-  height: 56px;
+/* ---------- Hero Section ---------- */
+.hero-wrapper {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.hero {
+  background-color: var(--bg-hero);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 80px;
+  overflow: hidden;
+}
+.hero-content {
+  max-width: 500px;
+}
+.hero-content h1 {
+  font-size: 56px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+.hero-content h1 span {
+  color: var(--primary);
+}
+.lede {
+  color: var(--text-muted);
+  font-size: 18px;
+  margin-bottom: 32px;
+}
+.subscribe-box {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 40px;
+  padding: 6px 6px 6px 20px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+.mail-icon {
+  margin-right: 12px;
+  color: var(--text-muted);
+}
+.subscribe-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  font-family: inherit;
+}
+.hero-image {
+  flex-shrink: 0;
+  width: 50%;
+  max-width: 500px;
+}
+.hero-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  object-fit: cover;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+}
+
+/* ---------- Featured Categories ---------- */
+.featured-categories {
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+.category-carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+}
+.cat-card {
+  min-width: 130px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px 10px;
+  text-align: center;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.cat-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: 0 4px 12px rgba(4, 108, 78, 0.05);
+}
+.cat-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin: 0 auto 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent-dim);
-  border-radius: 12px;
-  flex-shrink: 0;
+  overflow: hidden;
+  padding: 8px;
 }
-
-.spec-card-product h2{
-  font-size: 18px;
-  margin: 0 0 4px;
+.cat-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
-
-.spec-card-product p{
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 12.5px;
-  color: var(--ink-soft);
-}
-
-.spec-list{
-  margin: 0;
-  padding: 4px 22px 6px;
-}
-
-.spec-row{
-  display: flex;
-  justify-content: space-between;
-  padding: 11px 0;
-  border-top: 1px solid var(--line);
+.cat-card h4 {
   font-size: 14px;
+  margin-bottom: 4px;
+}
+.cat-card span {
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
-.spec-row dt{
-  color: var(--ink-soft);
-}
+/* Sub-colors for categories */
+.bg-blue { background: #e0f2fe; }
+.bg-green { background: #dcfce7; }
+.bg-orange { background: #ffedd5; }
+.bg-yellow { background: #fef08a; }
+.bg-teal { background: #ccfbf1; }
+.bg-red { background: #fee2e2; }
+.bg-purple { background: #f3e8ff; }
+.bg-lightgreen { background: #ecfccb; }
+.bg-pink { background: #fce7f3; }
 
-.spec-row dd{
-  margin: 0;
-  font-family: var(--font-mono);
-  font-weight: 600;
+/* ---------- Promo Banners ---------- */
+.promo-banners {
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
 }
-
-.spec-card-foot{
+.promo-card {
+  border-radius: 16px;
+  padding: 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  padding: 20px 22px 24px;
-  border-top: 1px solid var(--line);
+  overflow: hidden;
 }
+.bg-wheat { background: #f3e8d6; }
+.bg-lightblue { background: #e0f2fe; }
+.bg-tan { background: #fae8c8; }
 
-.price{
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.price-now{
-  font-family: var(--font-mono);
+.promo-content h3 {
   font-size: 20px;
-  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+.promo-img {
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+.promo-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
-.price-was{
-  font-family: var(--font-mono);
+/* ---------- Popular Products ---------- */
+.popular-products {
+  max-width: 1400px;
+  margin: 60px auto;
+  padding: 0 24px;
+}
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+.product-card {
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  background: #fff;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+}
+.badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  z-index: 10;
+}
+.badge.hot { background: #fca5a5; color: #991b1b; }
+.badge.sale { background: #93c5fd; color: #1e3a8a; }
+.badge.new { background: #86efac; color: #166534; }
+
+.product-img {
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.product-category {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 6px;
+}
+.product-card h3 {
+  font-size: 15px;
+  line-height: 1.4;
+  margin-bottom: 10px;
+  height: 42px;
+  overflow: hidden;
+}
+.rating {
+  font-size: 12px;
+  color: #fbbf24;
+  margin-bottom: 16px;
+}
+.rating span {
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.price .current {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+}
+.price .old {
   font-size: 13px;
-  color: var(--ink-soft);
+  color: var(--text-muted);
   text-decoration: line-through;
 }
 
-.card-btn{
-  padding: 11px 18px;
-  border-radius: 9px;
-  background: var(--accent);
-  color: white;
-  font-size: 14px;
-  white-space: nowrap;
-  transition: background .15s ease;
+/* ---------- Daily Sales ---------- */
+.daily-sales-section {
+  max-width: 1400px;
+  margin: 60px auto;
+  padding: 0 24px;
 }
-
-.card-btn:hover{
-  background: var(--ink);
+.sales-layout {
+  display: flex;
+  gap: 24px;
 }
-
-
-/* ---------- Shared section heads ---------- */
-.section-head{
-  max-width: 560px;
-  margin: 0 0 40px;
+.sales-banner {
+  flex: 0 0 300px;
+  background: linear-gradient(rgba(17, 54, 41, 0.8), rgba(17, 54, 41, 0.9)), url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80') center/cover;
+  border-radius: 16px;
+  padding: 40px 30px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
 }
-
-.section-kicker{
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--accent);
-}
-
-h2{
+.sales-banner h2 {
+  color: #fff;
   font-size: 32px;
-  font-weight: 700;
-  margin: 12px 0 10px;
+  line-height: 1.2;
+  margin-bottom: 24px;
 }
-
-.section-head p{
-  color: var(--ink-soft);
-  font-size: 16px;
-  margin: 0;
+.sales-content {
+  flex: 1;
 }
-
-
-/* ---------- Categories ---------- */
-.categories{
-  padding: 88px 24px;
-  max-width: 1180px;
-  margin: 0 auto;
-}
-
-.category-grid{
+.sales-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
+  gap: 20px;
+}
+.sale-card {
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 20px;
+  background: #fff;
+}
+.sale-card h3 {
+  font-size: 14px;
+  margin: 10px 0;
+  height: 38px;
+}
+.progress-bar {
+  background: var(--border-color);
+  height: 6px;
+  border-radius: 3px;
+  margin: 12px 0 8px;
+  overflow: hidden;
+}
+.progress-bar .fill {
+  background: var(--primary);
+  height: 100%;
+}
+.sold-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+/* ---------- Trending Stories ---------- */
+.trending-stories {
+  max-width: 1400px;
+  margin: 60px auto;
+  padding: 0 24px;
+}
+.stories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.story-card {
   border-radius: 16px;
   overflow: hidden;
 }
-
-@media (max-width: 800px){
-  .category-grid{
-    grid-template-columns: 1fr;
-  }
-}
-
-.category{
-  background: var(--panel);
-  padding: 32px 26px;
-  cursor: pointer;
-  transition: background .15s ease;
-}
-
-.category:hover{
-  background: var(--accent-dim);
-}
-
-.cat-icon{
-  font-size: 28px;
-  display: block;
-  margin-bottom: 14px;
-}
-
-.category h3{
-  font-size: 17px;
-  margin: 0 0 6px;
-}
-
-.category p{
-  color: var(--ink-soft);
-  font-size: 14px;
-  margin: 0 0 16px;
-  line-height: 1.5;
-}
-
-.cat-meta{
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--accent);
-  font-weight: 600;
-}
-
-
-/* ---------- Features ---------- */
-.features{
-  padding: 0 24px 88px;
-  max-width: 1180px;
-  margin: 0 auto;
-}
-
-.feature-grid{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-}
-
-@media (max-width: 800px){
-  .feature-grid{
-    grid-template-columns: 1fr;
-  }
-}
-
-.feature{
-  border-top: 2px solid var(--ink);
-  padding-top: 18px;
-}
-
-.feature-num{
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--accent);
-  font-weight: 700;
-}
-
-.feature h3{
-  font-size: 18px;
-  margin: 10px 0 8px;
-}
-
-.feature p{
-  color: var(--ink-soft);
-  font-size: 14.5px;
-  line-height: 1.6;
-  margin: 0;
-}
-
-
-/* ---------- Testimonial ---------- */
-.testimonial{
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 24px 96px;
-  text-align: center;
-}
-
-.quote{
-  font-family: var(--font-display);
-  font-size: 24px;
-  line-height: 1.5;
-  font-weight: 500;
-  margin: 0 0 20px;
-}
-
-.quote-author{
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.author-name{
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.author-meta{
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--ink-soft);
-}
-
-
-/* ---------- Bottom banner ---------- */
-.bottom-banner{
-  position: relative;
-  margin: 0 24px 64px;
-  max-width: 1132px;
-  margin-inline: auto;
-  padding: 72px 24px;
-  border-radius: 20px;
-  text-align: center;
-  background: var(--ink);
-  color: white;
+.story-img {
+  background: var(--bg-hero);
+  height: 200px;
+  border-radius: 16px;
+  margin-bottom: 16px;
   overflow: hidden;
 }
-
-.banner-grid{
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  display: flex;
-  gap: 6px;
+.story-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.story-card:hover .story-img img {
+  transform: scale(1.05);
+}
+.story-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.story-card h3 {
+  font-size: 16px;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+.read-more {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.read-more:hover {
+  color: var(--primary);
 }
 
-.banner-grid .dot.light{
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--signal);
-  opacity: .9;
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .product-grid { grid-template-columns: repeat(4, 1fr); }
+  .sales-layout { flex-direction: column; }
+  .sales-banner { flex: auto; width: 100%; min-height: 200px; }
+  .stories-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
-.bottom-banner h2{
-  font-size: 30px;
-  margin: 0 0 10px;
+@media (max-width: 900px) {
+  .hero { flex-direction: column; text-align: center; padding: 40px 20px; }
+  .hero-image { width: 100%; margin-top: 32px; }
+  .hero-content { margin-bottom: 0; }
+  .promo-banners { grid-template-columns: 1fr; }
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
+  .sales-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
-.bottom-banner p{
-  color: #c2c7d4;
-  font-size: 15.5px;
-  margin: 0 0 28px;
+@media (max-width: 600px) {
+  .product-grid, .sales-grid, .stories-grid { grid-template-columns: 1fr; }
 }
-
-.bottom-banner button{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 26px;
-  border-radius: 10px;
-  background: var(--accent);
-  color: white;
-  font-size: 15px;
-  transition: transform .15s ease, background .15s ease;
-}
-
-.bottom-banner button:hover{
-  background: var(--signal);
-  transform: translateY(-2px);
-}
-
 </style>

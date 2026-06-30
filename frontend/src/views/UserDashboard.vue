@@ -16,6 +16,8 @@
         @place-order="placeOrder"
       />
     </main>
+
+    <AppFooter />
   </div>
 </template>
 
@@ -26,6 +28,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import AppNavbar from '../components/AppNavbar.vue'
+import AppFooter from '../components/AppFooter.vue'
 
 const router = useRouter()
 

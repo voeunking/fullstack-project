@@ -59,7 +59,7 @@
                 <p class="mt-1 truncate text-sm font-semibold">{{ auth()->user()->name ?? 'Admin' }}</p>
             </div>
             <div class="p-4 border-t border-white/10">
-                <form action="{{ route('admin.logout') }}" method="POST" class="w-full">
+                <form action="" method="POST" class="w-full">
                     @csrf
                     <button type="submit" class="flex items-center w-full px-4 py-3 rounded-xl hover:bg-red-500/10 text-sm text-left text-slate-300 hover:text-red-200 transition">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>

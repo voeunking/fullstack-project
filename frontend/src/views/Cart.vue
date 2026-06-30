@@ -36,7 +36,7 @@
           <span>Total</span>
           <span>${{ total.toFixed(2) }}</span>
         </div>
-        <router-link to="/dashboard/checkout" class="checkout-btn">Proceed to Checkout</router-link>
+        <router-link to="/checkout" class="checkout-btn">Proceed to Checkout</router-link>
         <div class="secure-row">Secure checkout | Flexible payment</div>
       </div>
     </div>

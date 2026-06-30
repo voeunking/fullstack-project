@@ -11,18 +11,33 @@ const router = createRouter({
       component: () => import('../views/Home.vue'),
     },
     {
+      path: '/about',
+      name: 'about',
+      component: () => import('../views/About.vue'),
+    },
+    {
+      path: '/vendor',
+      name: 'vendor',
+      component: () => import('../views/Vendor.vue'),
+    },
+    {
+      path: '/contact',
+      name: 'contact',
+      component: () => import('../views/Contact.vue'),
+    },
+    {
       path: '/',
       name: 'root',
-      component: () => import('../App.vue'),
+      component: { template: '<router-view />' },
     },
     {
       path: '/register',
       name: 'register',
-      component: () => import('../App.vue'),
+      component: { template: '<router-view />' },
     },
 
     {
-      path: '/dashboard',
+      path: '/',
       component: () => import('../views/UserDashboard.vue'),
       children: [
 
@@ -34,6 +49,11 @@ const router = createRouter({
           path: 'products',
           name: 'products',
           component: () => import('../views/Products.vue'),
+        },
+        {
+          path: 'products/:id',
+          name: 'product-detail',
+          component: () => import('../views/ProductDetail.vue'),
         },
         {
           path: 'profile',
@@ -57,13 +77,18 @@ const router = createRouter({
           path: 'orders',
           name: 'orders',
           component: () => import('../views/Orders.vue'),
-
+        },
+        {
+          path: 'wishlist',
+          name: 'wishlist',
+          component: () => import('../views/Wishlist.vue'),
         },
       ],
     },
+
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/dashboard/products',
+      redirect: '/home',
     },
   ],
 })
@@ -73,17 +98,17 @@ router.beforeEach((to) => {
 
   // Logged-in users shouldn't see the login/register forms again.
   if ((to.name === 'root' || to.name === 'register') && loggedIn) {
-    return '/dashboard/products'
+    return '/home'
   }
 
   // Redirect bare /dashboard to either products (logged in) or home (logged out).
   if (to.path === '/dashboard') {
-    return loggedIn ? '/dashboard/products' : '/'
+    return loggedIn ? '/dashboard/products' : '/home'
   }
 
   // If user tries to access the dashboard directly but token is missing/invalid, bounce to home.
   if (to.path.startsWith('/dashboard') && !loggedIn) {
-    return '/'
+    return '/home'
   }
 
   return true
